@@ -115,7 +115,7 @@ table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
    Data lives only on this phone (IndexedDB). Optional backup to the teacher's own
    Google Drive + Google Sheet and Calendar sync through an Apps Script link.
    ========================================================= */
-const APP_VER = '1.1.0';
+const APP_VER = '1.2.0';
 const NATIVE = (() => { try { return !!(window.AndroidApp && AndroidApp.isApp()); } catch (e) { return false; } })();
 const SCHOOL = 'Bangladesh Air Force Shaheen College Bogura';
 /* author credit (encoded) */
@@ -633,7 +633,56 @@ function viewMarks(c, ex) {
    ========================================================= */
 const AI_MODEL = 'claude-opus-5-5';
 const AI_SDK = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.6.0/+esm';
-const aiKey = () => { try { return localStorage.getItem('bafsb-ai-key') || ''; } catch (e) { return ''; } };
+const GEM_API = 'https://generativelanguage.googleapis.com/v1beta/';
+const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k) || ''; if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return ''; } };
+const aiProvider = () => ls('bafsb-ai-provider') || (ls('bafsb-ai-key') ? 'claude' : (ls('bafsb-gemini-key') ? 'gemini' : 'gemini'));
+const PROV = {claude: {name: 'Claude', key: 'bafsb-ai-key', prefix: /^sk-ant-/, hint: 'sk-ant-…', site: 'console.anthropic.com'}, gemini: {name: 'Gemini', key: 'bafsb-gemini-key', prefix: /^AIza/, hint: 'AIza…', site: 'aistudio.google.com/apikey'}};
+const aiKey = () => ls(PROV[aiProvider()].key);
+const aiName = () => PROV[aiProvider()].name;
+/* ---- Gemini (REST) ---- */
+async function gemFetch(path, body) {
+  const r = await fetch(GEM_API + path, {method: body ? 'POST' : 'GET', headers: Object.assign({'x-goog-api-key': ls('bafsb-gemini-key')}, body ? {'Content-Type': 'application/json'} : {}), body: body ? JSON.stringify(body) : undefined});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error((j.error && j.error.message) || ('Gemini error ' + r.status)); e.status = r.status; e.gem = j.error && j.error.status; throw e; }
+  return j;
+}
+/** pick the newest stable Gemini "flash" model this key can use (falls back to pro / any gemini) */
+async function gemModel(force) {
+  const saved = ls('bafsb-gemini-model'); if (saved && !force) return saved;
+  const j = await gemFetch('models?pageSize=200');
+  const ms = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => m.name.replace(/^models\//, ''));
+  const ver = n => { const m = /gemini-(\d+(?:\.\d+)?)/.exec(n); return m ? parseFloat(m[1]) : 0; };
+  const pick = re => ms.filter(n => re.test(n)).sort((a, b) => ver(b) - ver(a))[0];
+  const m = pick(/^gemini-\d+(\.\d+)?-flash$/) || pick(/^gemini-\d+(\.\d+)?-pro$/) || pick(/^gemini-.*flash/) || pick(/^gemini-/);
+  if (!m) throw new Error('No Gemini model available for this key');
+  ls('bafsb-gemini-model', m); return m;
+}
+async function gemRead(parts, prompt, system, schema) {
+  const model = await gemModel();
+  const gparts = parts.map(p => ({inline_data: {mime_type: p.source.media_type, data: p.source.data}})).concat([{text: prompt + '\n\nReply only with JSON in this shape: {"rows":[{"roll":"","' + Object.keys(schema.properties.rows.items.properties).filter(k => k !== 'roll' && k !== 'unsure').join('":"","') + '":"","unsure":false}]}'}]);
+  const body = {systemInstruction: {parts: [{text: system}]}, contents: [{role: 'user', parts: gparts}], generationConfig: {responseMimeType: 'application/json', responseJsonSchema: schema, temperature: 0}};
+  let j;
+  try { j = await gemFetch('models/' + model + ':generateContent', body); }
+  catch (e) { if (e.status === 400 && /responseJsonSchema|temperature/i.test(e.message)) { delete body.generationConfig.responseJsonSchema; delete body.generationConfig.temperature; j = await gemFetch('models/' + model + ':generateContent', body); } else throw e; }
+  const cand = (j.candidates || [])[0];
+  if (!cand) throw new Error('Gemini gave no answer' + (j.promptFeedback && j.promptFeedback.blockReason ? ' (' + j.promptFeedback.blockReason + ')' : ''));
+  const txt = ((cand.content || {}).parts || []).map(p => p.text || '').join('').replace(/^```(json)?\s*|\s*```$/g, '');
+  return {text: txt, truncated: cand.finishReason === 'MAX_TOKENS'};
+}
+/* ---- Claude (Anthropic SDK) ---- */
+async function claudeRead(parts, prompt, system, schema) {
+  const client = await aiClient();
+  const res = await client.beta.messages.create({
+    model: AI_MODEL, max_tokens: 16000,
+    betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+    output_config: {effort: 'high', format: {type: 'json_schema', schema}},
+    system,
+    messages: [{role: 'user', content: parts.concat([{type: 'text', text: prompt}])}],
+  });
+  if (res.stop_reason === 'refusal') throw new Error('Claude could not read these pages. Try clearer photos.');
+  const tb = (res.content || []).find(b => b.type === 'text');
+  return {text: tb ? tb.text : '', truncated: res.stop_reason === 'max_tokens'};
+}
 const blobToB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(b); });
 async function aiClient() {
   const mod = await import(AI_SDK);
@@ -650,16 +699,18 @@ async function fileToPart(file) {
 }
 function aiErr(e) {
   const s = e && e.status;
-  if (s === 401) return 'The API key is wrong or expired. Check it in Settings.';
-  if (s === 402 || /credit|billing/i.test(e && e.message || '')) return 'No API credit left. Add credit in the Claude Console.';
-  if (s === 429) return 'Too many requests right now. Wait a minute and try again.';
+  const msg = String(e && e.message || '');
+  if (s === 401 || /API_KEY_INVALID|API key not valid/i.test(msg)) return 'The ' + aiName() + ' API key is wrong or expired. Check it in Settings.';
+  if (s === 402 || /credit|billing/i.test(msg)) return 'No API credit / billing for ' + aiName() + '. Check your account.';
+  if (s === 429 || (e && e.gem === 'RESOURCE_EXHAUSTED')) return 'Limit reached for now (free quota or too many requests). Wait a minute and try again.';
+  if (s === 403) return 'This key is not allowed to use ' + aiName() + ' here. Check the key settings.';
   if (s === 413) return 'The files are too large. Use fewer or smaller photos.';
   if (!navigator.onLine) return 'No internet connection.';
   return (e && e.message ? e.message : String(e)).slice(0, 200);
 }
 function scanMarks(c, ex) {
   if (!aiKey()) {
-    sheet('Scan marks needs a key', '<p class="muted">To read handwritten marks from a photo or file, add your Claude API key once in ⚙️ Settings → “Scan marks with AI”.</p>',
+    sheet('Scan marks needs a key', '<p class="muted">To read handwritten marks from a photo or file, add a Gemini or Claude API key once in ⚙️ Settings → “Scan marks with AI”.</p>',
       [{label: 'Close', cls: 'sec'}, {label: 'Open Settings', fn: () => go('#/settings')}]);
     return;
   }
@@ -673,7 +724,7 @@ function scanMarks(c, ex) {
     const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !capture; if (capture) i.capture = 'environment';
     i.onchange = () => { [...i.files].forEach(f => files.push(f)); draw(el); }; i.click();
   };
-  sheet('Scan marks · ' + ex.name, '<p class="muted small">Write marks by hand on the printed marksheet, then add a photo or file of each page. Claude reads the marks and fills them in for you to check. The pages are sent to Anthropic (Claude) only for reading.</p>' +
+  sheet('Scan marks · ' + ex.name, '<p class="muted small">Write marks by hand on the printed marksheet, then add a photo or file of each page. ' + aiName() + ' reads the marks and fills them in for you to check. The pages are sent to ' + (aiProvider() === 'claude' ? 'Anthropic (Claude)' : 'Google (Gemini)') + ' only for reading.</p>' +
     '<div style="display:grid;gap:8px"><button class="btn sec full" id="s1">📷 Take photo (camera)</button><button class="btn sec full" id="s2">🖼 Choose photo from gallery</button><button class="btn sec full" id="s3">📄 Upload file (image or PDF)</button></div>' +
     '<div class="hr"></div><div id="fl"></div>',
     [{label: 'Cancel', cls: 'sec'}, {label: '🤖 Read marks', fn: () => { runScan(c, ex, files.slice()); }}], el => {
@@ -686,12 +737,12 @@ function scanMarks(c, ex) {
 async function runScan(c, ex, files) {
   if (!files.length) return;
   const list = studentsOf(c.id), cols = colsOf(ex);
-  const box = sheet('Reading marks…', '<p class="muted">Claude is reading ' + files.length + ' page(s). This usually takes 20–60 seconds. Keep the app open.</p><div class="pill" id="prog">Preparing pages…</div>');
+  const box = sheet('Reading marks…', '<p class="muted">' + aiName() + ' is reading ' + files.length + ' page(s). This usually takes 20–60 seconds. Keep the app open.</p><div class="pill" id="prog">Preparing pages…</div>');
   const setP = t => { const p = $('#prog', box.el); if (p) p.textContent = t; };
   try {
     const parts = [];
     for (const f of files) parts.push(await fileToPart(f));
-    setP('Sending to Claude…');
+    setP('Sending to ' + aiName() + '…');
     const keys = cols.map(x => x.k).concat(['total']);
     const props = {roll: {type: 'string', description: 'Roll number exactly as on the sheet'}};
     keys.forEach(k => { props[k] = {type: 'string'}; });
@@ -704,18 +755,10 @@ async function runScan(c, ex, files) {
       'Return one row for every student whose row has at least one handwritten mark. Copy each value exactly as written (digits, decimals like 7.5). ' +
       'Use "-" when the cell says Ab / A / absent. Use "" for an empty cell. Never invent a value: if a mark cannot be read, write your best reading and set unsure to true. ' +
       'Match rows by the printed Roll; if the roll is unclear use the printed name.';
-    const client = await aiClient();
-    const res = await client.beta.messages.create({
-      model: AI_MODEL, max_tokens: 16000,
-      betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
-      output_config: {effort: 'high', format: {type: 'json_schema', schema}},
-      system: 'You read handwritten marks from photos and scans of printed school marksheets and return them as data. Be exact; accuracy matters more than speed.',
-      messages: [{role: 'user', content: parts.concat([{type: 'text', text}])}],
-    });
+    const system = 'You read handwritten marks from photos and scans of printed school marksheets and return them as data. Be exact; accuracy matters more than speed.';
+    const out = aiProvider() === 'claude' ? await claudeRead(parts, text, system, schema) : await gemRead(parts, text, system, schema);
     box.close();
-    if (res.stop_reason === 'refusal') { toast('Claude could not read these pages. Try clearer photos.'); return; }
-    const tb = (res.content || []).find(b => b.type === 'text');
-    let data; try { data = JSON.parse(tb ? tb.text : ''); } catch (e) { toast('The reply could not be read' + (res.stop_reason === 'max_tokens' ? ' (too long — scan fewer pages at once)' : '') + '. Try again.'); return; }
+    let data; try { data = JSON.parse(out.text); } catch (e) { toast('The reply could not be read' + (out.truncated ? ' (too long — scan fewer pages at once)' : '') + '. Try again.'); return; }
     applyScan(c, ex, data.rows || []);
   } catch (e) { box.close(); toast('⚠️ ' + aiErr(e)); }
 }
@@ -1144,8 +1187,12 @@ function viewSettings() {
     '<div class="card"><h3>🗒 Note types</h3><p class="muted small">Used when writing notes about a student.</p><div id="nts"></div><div class="row" style="margin-top:8px"><input class="f grow" id="ntn" placeholder="New note type"><button class="btn sm" id="ntA">Add</button></div></div>' +
     '<div class="card"><h3>➕ Extra student fields</h3><p class="muted small">Your own fields shown for every student (e.g. Blood group, House, Bus route).</p><div id="cfs"></div><div class="row" style="margin-top:8px"><input class="f grow" id="cfn" placeholder="New field name"><button class="btn sm" id="cfA">Add</button></div></div>' +
     '<div class="card"><h3>🔠 Text size</h3><div class="chips">' + [['1', 'Normal'], ['1.1', 'Large'], ['1.2', 'Extra large']].map(([z, n]) => '<span class="chip ' + (String(st.textSize || 1) === z ? 'on' : '') + '" data-z="' + z + '">' + n + '</span>').join('') + '</div></div>' +
-    '<div class="card"><h3>🤖 Scan marks with AI (Claude)</h3><p class="muted small">Lets the app read handwritten marks from a photo or PDF of the marksheet. Needs a Claude API key from console.anthropic.com (paid; roughly 10 taka per page, check usage in the Console). The key stays only on this phone — it is not put in backups.</p>' +
-    '<input class="f" id="ak" type="password" autocomplete="off" placeholder="' + (aiKey() ? 'Key saved ✓ (paste a new one to replace)' : 'sk-ant-…') + '">' +
+    '<div class="card"><h3>🤖 Scan marks with AI</h3><p class="muted small">Used only when entering marks: reads handwritten marks from a photo or PDF of the marksheet. Choose which AI to use. Keys stay only on this phone — never in backups.</p>' +
+    '<div class="chips">' + ['gemini', 'claude'].map(p => '<span class="chip ' + (aiProvider() === p ? 'on' : '') + '" data-pv="' + p + '">' + PROV[p].name + (ls(PROV[p].key) ? ' ✓' : '') + '</span>').join('') + '</div>' +
+    '<p class="muted small">' + (aiProvider() === 'gemini'
+      ? '<b>Gemini</b>: key from <b>aistudio.google.com/apikey</b> (starts with AIza). Has a free quota; on the free tier Google may use the pages to improve its products — turn on billing in AI Studio to avoid that.' + (ls('bafsb-gemini-model') ? '<br>Model: ' + esc(ls('bafsb-gemini-model')) : '')
+      : '<b>Claude</b>: key from <b>console.anthropic.com</b> (starts with sk-ant-). Paid — roughly 10 taka per page; check usage in the Console.') + '</p>' +
+    '<input class="f" id="ak" type="password" autocomplete="off" placeholder="' + (aiKey() ? aiName() + ' key saved ✓ (paste a new one to replace)' : PROV[aiProvider()].hint) + '">' +
     '<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" id="akS">Save key</button><button class="btn sm sec" id="akT"' + (aiKey() ? '' : ' disabled') + '>Test</button><button class="btn sm red" id="akR"' + (aiKey() ? '' : ' disabled') + '>Remove</button></div></div>' +
     '<div class="card"><h3>☁️ Google (Calendar + Drive + Sheet)</h3><p class="muted small">Your own Apps Script link (…/exec?k=secret). Data goes only to your Google account.</p>' +
     '<input class="f" id="g1" placeholder="https://script.google.com/macros/s/…/exec?k=…" value="' + esc(st.sync) + '"><div class="row" style="gap:8px;margin-top:8px"><button class="btn sm sec" id="gT">Test link</button><button class="btn sm" id="gB">☁️ Back up now</button><button class="btn sm sec" id="gR">Restore from Drive</button></div>' +
@@ -1168,9 +1215,16 @@ function viewSettings() {
   drawList('#cfs', st.customFields, (i, nv) => { const old = st.customFields[i]; st.customFields[i] = nv; S.students.forEach(s => { if (s.custom && old in s.custom) { s.custom[nv] = s.custom[old]; delete s.custom[old]; } }); save(); toast('Renamed'); },
     i => withUndo('Field removed', () => { const n = st.customFields.splice(i, 1)[0]; S.students.forEach(s => { if (s.custom) delete s.custom[n]; }); }));
   $$('[data-z]', app).forEach(ch => ch.onclick = () => { st.textSize = +ch.dataset.z; applyTextSize(); save(); render(); });
-  $('#akS').onclick = () => { const v = $('#ak').value.trim(); if (!/^sk-ant-/.test(v)) { toast('That does not look like a Claude API key (starts with sk-ant-)'); return; } try { localStorage.setItem('bafsb-ai-key', v); } catch (e) {} render(); toast('Key saved on this phone'); };
-  $('#akR').onclick = () => { try { localStorage.removeItem('bafsb-ai-key'); } catch (e) {} render(); toast('Key removed'); };
-  $('#akT').onclick = async () => { toast('Testing…'); try { const cl = await aiClient(); const m = await cl.models.retrieve(AI_MODEL); toast('✅ Key works · ' + (m.display_name || AI_MODEL)); } catch (e) { toast('⚠️ ' + aiErr(e)); } };
+  $$('[data-pv]', app).forEach(ch => ch.onclick = () => { ls('bafsb-ai-provider', ch.dataset.pv); render(); });
+  $('#akS').onclick = () => { const P = PROV[aiProvider()], v = $('#ak').value.trim(); if (!P.prefix.test(v)) { toast('That does not look like a ' + P.name + ' API key (starts with ' + P.hint.replace('…', '') + ')'); return; } ls(P.key, v); if (aiProvider() === 'gemini') ls('bafsb-gemini-model', null); render(); toast(P.name + ' key saved on this phone'); };
+  $('#akR').onclick = () => { ls(PROV[aiProvider()].key, null); if (aiProvider() === 'gemini') ls('bafsb-gemini-model', null); render(); toast('Key removed'); };
+  $('#akT').onclick = async () => {
+    toast('Testing…');
+    try {
+      if (aiProvider() === 'claude') { const cl = await aiClient(); const m = await cl.models.retrieve(AI_MODEL); toast('✅ Claude key works · ' + (m.display_name || AI_MODEL)); }
+      else { const m = await gemModel(true); toast('✅ Gemini key works · ' + m); render(); }
+    } catch (e) { toast('⚠️ ' + aiErr(e)); }
+  };
   $('#ntA').onclick =() => { const v = $('#ntn').value.trim(); if (v && !st.noteTypes.includes(v)) { st.noteTypes.push(v); save(); render(); } };
   $('#cfA').onclick = () => { const v = $('#cfn').value.trim(); if (v && !st.customFields.includes(v)) { st.customFields.push(v); save(); render(); } };
   $('#gT').onclick = async () => { st.sync = $('#g1').value.trim(); save(true); try { const j = await gPost({action: 'ping'}); toast('✅ Connected to calendar: ' + j.calendar); } catch (e) { toast('⚠️ ' + e.message); } };
