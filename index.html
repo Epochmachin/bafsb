@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BAFSB Tracker</title>
+<meta name="theme-color" content="#12355B">
+<meta name="description" content="Student tracker for BAF Shaheen College Bogura: students, guardians, notes, marks and printable marksheets.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--brand:#12355B;--brand2:#1d4f86;--accent:#C8102E;--bg:#F3F5F9;--card:#fff;--ink:#16202c;--muted:#64748b;--line:#e2e8f0;--ok:#15803d;--warn:#b45309;--bad:#C8102E;--r:14px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+header.top h1{font-size:17px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
+header.top .sub{font-size:12px;opacity:.8;font-weight:400}
+header.top img{width:34px;height:34px;border-radius:50%;background:#fff}
+.ib{background:none;border:0;color:inherit;width:38px;height:38px;border-radius:10px;font-size:20px;display:grid;place-items:center;cursor:pointer;text-decoration:none}
+.ib:active{background:rgba(255,255,255,.15)}
+main{max-width:760px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,23,42,.06);border:1px solid var(--line)}
+.card h3{margin:0 0 8px;font-size:15px}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.wrap{flex-wrap:wrap}
+.btn{border:0;border-radius:11px;padding:10px 14px;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;justify-content:center}
+.btn.sec{background:#e8eef7;color:var(--brand)}
+.btn.red{background:#fde8eb;color:var(--bad)}
+.btn.green{background:#e6f4ea;color:var(--ok)}
+.btn.sm{padding:7px 10px;font-size:13px;border-radius:9px}
+.btn.full{width:100%}
+.btn:disabled{opacity:.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cls{display:flex;gap:12px;align-items:center;cursor:pointer}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;vertical-align:middle}
+.badge.ct{background:#fff4d6;color:#8a5a00}
+.badge.red{background:#fde8eb;color:var(--bad)}
+.badge.grey{background:#eef0f3;color:#556}
+.av{width:42px;height:42px;border-radius:12px;background:var(--brand);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.av.c7{background:#0f766e}.av.c8{background:#7c3aed}.av.c9{background:#12355B}.av.c10{background:#b45309}
+.list{background:var(--card);border-radius:var(--r);border:1px solid var(--line);overflow:hidden;margin-bottom:12px}
+.li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.li:last-child{border-bottom:0}
+.li:active{background:#f6f8fb}
+.roll{width:36px;height:36px;border-radius:50%;background:#e8eef7;color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.call{width:40px;height:40px;border-radius:50%;background:#e6f4ea;color:var(--ok);display:grid;place-items:center;text-decoration:none;font-size:18px;flex:none}
+.tabs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
+.tab{padding:8px 14px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;border:0;white-space:nowrap;cursor:pointer}
+.tab.on{background:var(--brand);color:#fff}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:13px;cursor:pointer}
+.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+input.f,select.f,textarea.f{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 11px;background:#fff;outline:none}
+input.f:focus,select.f:focus,textarea.f:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(29,79,134,.15)}
+label.l{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+.search{position:relative;margin-bottom:10px}
+.search input{padding-left:36px}
+.search span{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:18px;background:var(--accent);color:#fff;border:0;font-size:30px;box-shadow:0 6px 16px rgba(200,16,46,.35);z-index:15;cursor:pointer}
+.sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+.sheet{background:#fff;width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));animation:up .2s ease-out}
+.sheet h2{margin:0 0 6px;font-size:18px}
+.sheet .acts{display:flex;gap:8px;margin-top:16px;position:sticky;bottom:-18px;background:#fff;padding:10px 0 4px}
+.sheet .acts .btn{flex:1}
+@keyframes up{from{transform:translateY(40px);opacity:0}}@keyframes fade{from{opacity:0}}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 14px;border-radius:12px;z-index:60;display:none;align-items:center;gap:12px;max-width:92vw;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#toast button{background:none;border:0;color:#93c5fd;font-weight:700;cursor:pointer}
+table.mk{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px}
+table.mk th{position:sticky;top:0;background:#e8eef7;color:var(--brand);font-size:11.5px;padding:7px 4px;text-align:center;z-index:2}
+table.mk td{border-bottom:1px solid var(--line);padding:4px 2px;text-align:center;background:#fff}
+table.mk td.nm{text-align:left;max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+table.mk input{width:100%;min-width:34px;max-width:52px;border:1px solid #cbd5e1;border-radius:7px;padding:7px 2px;text-align:center;background:#fff}
+table.mk input.bad{border-color:var(--bad);background:#fde8eb}
+table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
+.mkwrap{overflow:auto;max-height:calc(100vh - 210px);border-radius:var(--r);border:1px solid var(--line);background:#fff}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:14px}
+.kv div:nth-child(odd){color:var(--muted);font-size:13px}
+.note{border-left:3px solid var(--brand2);padding:6px 10px;margin:8px 0;background:#f8fafc;border-radius:0 10px 10px 0}
+.note.Behaviour{border-color:#7c3aed}.note.Weakness{border-color:var(--bad)}.note.Study{border-color:var(--ok)}
+.stars{color:#f59e0b;letter-spacing:1px}
+.starpick button{background:none;border:0;font-size:26px;color:#cbd5e1;cursor:pointer;padding:0 2px}
+.starpick button.on{color:#f59e0b}
+.bars{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:8px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--muted)}
+.bar i{display:block;width:100%;max-width:38px;border-radius:6px 6px 0 0;background:var(--brand2)}
+.bar i.low{background:var(--bad)}
+.bar b{color:var(--ink);font-size:11.5px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.warnbox{background:#fff7e6;border:1px solid #fcd9a0;color:#7a4b00;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
+.ocrrow{display:grid;grid-template-columns:26px 54px 1fr 118px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.ocrrow input.f{padding:7px 6px;font-size:13.5px}
+.pill{font-size:12px;padding:3px 8px;border-radius:8px;background:#eef2f7}
+.hr{height:1px;background:var(--line);margin:12px 0}
+.small{font-size:12.5px}
+.right{margin-left:auto}
+@media (min-width:700px){.ocrrow{grid-template-columns:26px 70px 1fr 160px 30px}}
+</style>
+</head>
+<body>
+<header class="top" id="hdr"></header>
+<main id="app"></main>
+<div id="toast"></div>
+<script src="vendor/jspdf.umd.min.js" defer></script>
+<script>
+'use strict';
+/* =========================================================
+   BAFSB Student Tracker — single-file app
+   Data lives only on this phone (IndexedDB). Optional backup to the teacher's own
+   Google Drive + Google Sheet and Calendar sync through an Apps Script link.
+   ========================================================= */
+const APP_VER = '1.0.0';
+const NATIVE = (() => { try { return !!(window.AndroidApp && AndroidApp.isApp()); } catch (e) { return false; } })();
+const SCHOOL = 'Bangladesh Air Force Shaheen College Bogura';
+/* author credit (encoded) */
+const _K = 'eWdvbG9pQiAscmVoY2FlVCB0bmF0c2lzc0F8bWFsc0kgbHVydWhhWiBhemFoSyBkTQ==';
+const AUTHOR = (() => { try { const [n, r] = decodeURIComponent(escape(atob(_K))).split('').reverse().join('').split('|'); return {name: n, role: r}; } catch (e) { return {name: '', role: ''}; } })();
+
+const EXAMS = [
+  {key: 'pop1', kind: 'pop', name: 'Pop Test (before Half-yearly)', print: 'Half-yearly', short: 'PT-H'},
+  {key: 'ct1', kind: 'main', name: 'Half-yearly Class Test', print: 'Half-yearly Class Test', short: 'CT-H'},
+  {key: 'hy', kind: 'main', name: 'Half-yearly Examination', print: 'Half-yearly', short: 'HY'},
+  {key: 'pop2', kind: 'pop', name: 'Pop Test (before Annual)', print: 'Annual', short: 'PT-A'},
+  {key: 'ct2', kind: 'main', name: 'Annual Class Test', print: 'Annual Class Test', short: 'CT-A'},
+  {key: 'an', kind: 'main', name: 'Annual Examination', print: 'Annual', short: 'AN'},
+];
+const EX = Object.fromEntries(EXAMS.map(x => [x.key, x]));
+const colsOf = ex => ex.kind === 'pop'
+  ? [{k: 'p1', label: 'PT-1', num: 1}, {k: 'p2', label: 'PT-2', num: 1}, {k: 'p3', label: 'PT-3', num: 1}]
+  : [{k: 'code', label: 'Code No.'}, {k: 'codeMark', label: "Code's Mark"}, {k: 'cq', label: 'CQ', num: 1}, {k: 'mcq', label: 'MCQ', num: 1}];
+const outColsOf = ex => ex.kind === 'pop' ? [{k: 'total', label: 'Total'}, {k: 'avg', label: 'Average'}] : [{k: 'total', label: 'Total'}];
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const fmtDate = s => { if (!s) return ''; const d = new Date(s + 'T00:00:00'); return d.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}); };
+const WD = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const byRoll = (a, b) => (parseFloat(a.roll) || 9999) - (parseFloat(b.roll) || 9999) || String(a.name).localeCompare(b.name);
+const phoneDigits = p => String(p || '').replace(/[^\d+]/g, '');
+const waNum = p => { let d = String(p || '').replace(/\D/g, ''); if (d.startsWith('0')) d = '88' + d; if (d.length === 10 && d.startsWith('1')) d = '880' + d; return d; };
+const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+const num = v => { if (v === '' || v == null || v === '-') return null; const n = parseFloat(v); return isNaN(n) ? null : n; };
+const r2 = n => Math.round(n * 100) / 100;
+
+/* ---------- storage (IndexedDB, localStorage fallback) ---------- */
+const IDB = {
+  db: null,
+  open() { return new Promise((res, rej) => { const r = indexedDB.open('bafsb', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => { this.db = r.result; res(); }; r.onerror = () => rej(r.error); }); },
+  get(k) { return new Promise((res, rej) => { const q = this.db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+  set(k, v) { return new Promise((res, rej) => { const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); },
+};
+let useLS = false;
+function blank() {
+  return {v: 1, settings: {teacher: '', year: new Date().getFullYear(), sync: '', lastBackup: 0, lastFile: 0, dirtyAt: 0,
+    full: {pop: 5, ct: 20, main: 100}, customFields: [], noteTypes: ['Behaviour', 'Study', 'Subject progress', 'Weakness', 'Other']},
+    classes: [], students: [], notes: [], marks: {}, events: []};
+}
+let S = blank();
+async function load() {
+  try { await IDB.open(); const d = await IDB.get('db'); if (d) S = d; }
+  catch (e) { useLS = true; try { const d = localStorage.getItem('bafsb-db'); if (d) S = JSON.parse(d); } catch (x) {} }
+  const b = blank();
+  S.settings = Object.assign(b.settings, S.settings || {});
+  S.settings.full = Object.assign(b.settings.full, S.settings.full || {});
+  for (const k of ['classes', 'students', 'notes', 'events']) if (!Array.isArray(S[k])) S[k] = [];
+  if (!S.marks) S.marks = {};
+  S.classes.forEach(c => { if (!c.year) c.year = S.settings.year; });
+  if (!S.settings.teacher) S.settings.teacher = AUTHOR.name;
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+}
+let saveT = null;
+function save(quiet) {
+  S.settings.dirtyAt = Date.now();
+  clearTimeout(saveT);
+  saveT = setTimeout(async () => {
+    try { if (useLS) localStorage.setItem('bafsb-db', JSON.stringify(S)); else await IDB.set('db', S); }
+    catch (e) { toast('⚠️ Could not save: ' + e.message); }
+  }, quiet ? 400 : 50);
+  scheduleCloud();
+}
+
+/* ---------- toast + undo ---------- */
+let toastT = null;
+function toast(msg, undoFn) {
+  const t = $('#toast');
+  t.innerHTML = '<span>' + esc(msg) + '</span>' + (undoFn ? '<button id="undoBtn">UNDO</button>' : '');
+  t.style.display = 'flex';
+  if (undoFn) $('#undoBtn').onclick = () => { undoFn(); t.style.display = 'none'; };
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', undoFn ? 6000 : 3000);
+}
+/** Run a destructive change with a snapshot so it can be undone for a few seconds. */
+function withUndo(msg, fn) {
+  const snap = JSON.stringify(S);
+  fn(); save(); render();
+  toast(msg, () => { S = JSON.parse(snap); save(); render(); toast('Restored'); });
+}
+
+/* ---------- bottom sheet (forms, dialogs) ---------- */
+function sheet(title, body, actions = [], onMount) {
+  const bg = document.createElement('div');
+  bg.className = 'sheet-bg';
+  bg.innerHTML = '<div class="sheet" role="dialog"><h2>' + esc(title) + '</h2>' + body +
+    (actions.length ? '<div class="acts">' + actions.map((a, i) => '<button class="btn ' + (a.cls || '') + '" data-i="' + i + '">' + a.label + '</button>').join('') + '</div>' : '') + '</div>';
+  const close = () => bg.remove();
+  bg.addEventListener('click', e => { if (e.target === bg) close(); });
+  $$('.acts .btn', bg).forEach(b => b.onclick = async () => { const a = actions[+b.dataset.i]; const r = a.fn ? await a.fn(bg) : true; if (r !== false) close(); });
+  document.body.appendChild(bg);
+  if (onMount) onMount(bg, close);
+  const first = $('input.f,textarea.f', bg); if (first && !first.dataset.nofocus && !('ontouchstart' in window)) first.focus();
+  return {el: bg, close};
+}
+function confirmBox(title, text, okLabel, fn, danger = true) {
+  sheet(title, '<p class="muted" style="font-size:14px">' + text + '</p>', [{label: 'Cancel', cls: 'sec'}, {label: okLabel, cls: danger ? 'red' : '', fn}]);
+}
+const val = (el, sel) => ($(sel, el).value || '').trim();
+
+/* ---------- data lookups ---------- */
+const cls = id => S.classes.find(c => c.id === id);
+const stu = id => S.students.find(s => s.id === id);
+const studentsOf = (cid, withRemoved) => S.students.filter(s => s.classId === cid && (withRemoved || !s.archived)).sort(byRoll);
+const classLabel = c => c ? c.name + (c.section ? ' · ' + c.section : '') : '';
+const avClass = c => { const m = /(\d+)/.exec(c.name || ''); return m ? 'c' + m[1] : ''; };
+const markKey = (cid, ek) => cid + '|' + ek;
+const marksOf = (cid, ek) => S.marks[markKey(cid, ek)] || (S.marks[markKey(cid, ek)] = {});
+const fullOf = ex => ex.kind === 'pop' ? S.settings.full.pop : (ex.key.startsWith('ct') ? S.settings.full.ct : S.settings.full.main);
+function calc(ex, m) {
+  if (ex.kind === 'pop') {
+    const v = ['p1', 'p2', 'p3'].map(k => m[k]).filter(x => x !== '' && x != null);
+    if (!v.length) { delete m.total; delete m.avg; return; }
+    const t = ['p1', 'p2', 'p3'].reduce((a, k) => a + (num(m[k]) || 0), 0);
+    m.total = r2(t); m.avg = r2(t / 3);
+  } else {
+    if ((m.cq === '' || m.cq == null) && (m.mcq === '' || m.mcq == null)) { delete m.total; return; }
+    m.total = r2((num(m.cq) || 0) + (num(m.mcq) || 0));
+  }
+}
+/** percent for a student's exam (null when nothing entered) */
+function pct(cid, ek, sid) {
+  const ex = EX[ek], m = (S.marks[markKey(cid, ek)] || {})[sid];
+  if (!m || m.total == null) return null;
+  return ex.kind === 'pop' ? (m.avg / S.settings.full.pop) * 100 : (m.total / fullOf(ex)) * 100;
+}
+function isWeak(s) {
+  if (s.weakness) return true;
+  let last = null;
+  EXAMS.forEach(x => { const p = pct(s.classId, x.key, s.id); if (p != null) last = p; });
+  return last != null && last < 40;
+}
+
+/* =========================================================
+   ROUTER + RENDER
+   ========================================================= */
+function go(h) { location.hash = h; }
+window.addEventListener('hashchange', render);
+function setHeader(title, sub, back, right = '') {
+  $('#hdr').innerHTML = (back ? '<a class="ib" href="' + back + '" aria-label="Back">←</a>' : '<img src="icon-192.png" alt="">') +
+    '<h1>' + esc(title) + (sub ? '<div class="sub">' + esc(sub) + '</div>' : '') + '</h1>' + right;
+}
+function render() {
+  const h = location.hash.replace(/^#\/?/, '').split('/');
+  const fab = $('.fab'); if (fab) fab.remove();
+  window.scrollTo(0, 0);
+  if (h[0] === 'class' && cls(h[1])) { if (h[2] === 'marks' && EX[h[3]]) return viewMarks(cls(h[1]), EX[h[3]]); return viewClass(cls(h[1]), h[2] || 'students'); }
+  if (h[0] === 'student' && stu(h[1])) return viewStudent(stu(h[1]));
+  if (h[0] === 'events') return viewEvents();
+  if (h[0] === 'settings') return viewSettings();
+  viewHome();
+}
+
+/* ---------- HOME ---------- */
+function viewHome() {
+  setHeader('BAFSB Tracker', 'Session ' + S.settings.year + (S.settings.teacher ? ' · ' + S.settings.teacher : ''), '',
+    '<a class="ib" href="#/events" aria-label="Calendar">📅</a><a class="ib" href="#/settings" aria-label="Settings">⚙️</a>');
+  const app = $('#app');
+  let html = '';
+  const days = S.settings.lastBackup ? (Date.now() - S.settings.lastBackup) / 864e5 : 999;
+  if (S.students.length && days > 7) html += '<div class="warnbox">💾 No backup for ' + (days > 900 ? 'a long time' : Math.floor(days) + ' days') + '. <a href="#/settings"><b>Back up now</b></a> — if the phone is lost or reset, data is lost.</div>';
+  html += '<div class="search"><span>🔎</span><input class="f" id="q" placeholder="Search any student by name or roll" autocomplete="off"></div><div id="qres"></div>';
+  const years = [...new Set(S.classes.map(c => String(c.year)))].sort();
+  const yr = String(viewYear || S.settings.year);
+  if (years.length > 1 || (years.length && !years.includes(String(S.settings.year)))) html += '<div class="chips">' + [...new Set(years.concat(String(S.settings.year)))].sort().map(y => '<span class="chip ' + (y === yr ? 'on' : '') + '" data-y="' + y + '">' + y + (y === String(S.settings.year) ? ' (current)' : '') + '</span>').join('') + '</div>';
+  const yClasses = S.classes.filter(c => String(c.year) === yr);
+  if (!S.classes.length) {
+    html += '<div class="card"><h3>Welcome 👋</h3><p class="muted">Start by adding the classes you teach. You can change, add or delete them any time.</p>' +
+      '<button class="btn full" id="quick">⚡ Add my 4 classes (7 Science, 8 Science, 9 Biology, 10 Biology)</button><div style="height:8px"></div>' +
+      '<button class="btn sec full" id="addC">＋ Add one class</button></div>';
+  } else {
+    if (!yClasses.length) html += '<div class="empty">No classes in ' + yr + '.</div>';
+    const list = yClasses.sort((a, b) => (parseInt(/\d+/.exec(a.name) || 0) - parseInt(/\d+/.exec(b.name) || 0)) || (b.ct - a.ct));
+    list.forEach(c => {
+      const n = studentsOf(c.id).length, weak = studentsOf(c.id).filter(isWeak).length;
+      html += '<div class="card cls" data-c="' + c.id + '"><div class="av ' + avClass(c) + '">' + esc((/\d+/.exec(c.name) || ['?'])[0]) + '</div><div class="grow">' +
+        '<div class="name">' + esc(classLabel(c)) + ' ' + (c.ct ? '<span class="badge ct">⭐ Class Teacher</span>' : '') + '</div>' +
+        '<div class="muted">' + esc(c.subject || '') + ' · ' + n + ' students' + (weak ? ' · <span style="color:var(--bad)">' + weak + ' need care</span>' : '') + '</div></div><span class="muted">›</span></div>';
+    });
+    html += '<button class="btn sec full" id="addC">＋ Add class / section</button>';
+    if (yr === String(S.settings.year)) html += '<div style="height:8px"></div><button class="btn sec full" id="promo">🎓 Start new session ' + (Number(S.settings.year) + 1) + ' (move students up)</button>';
+  }
+  const up = S.events.filter(e => e.type !== 'routine' && e.date >= today()).sort((a, b) => a.date < b.date ? -1 : 1).slice(0, 4);
+  if (up.length) html += '<div class="card" style="margin-top:12px"><h3>📅 Coming up</h3>' + up.map(e => '<div class="row" style="margin:6px 0"><span class="pill">' + fmtDate(e.date) + '</span><span class="grow small">' + esc(evTitle(e)) + '</span></div>').join('') + '<a class="small" href="#/events">All dates & routine ›</a></div>';
+  html += '<p class="muted small" style="text-align:center;margin-top:18px">BAFSB · Developed by ' + esc(AUTHOR.name) + '<br>' + esc(AUTHOR.role) + '</p>';
+  app.innerHTML = html;
+  $$('.cls', app).forEach(el => el.onclick = () => go('#/class/' + el.dataset.c));
+  $$('[data-y]', app).forEach(el => el.onclick = () => { viewYear = el.dataset.y === String(S.settings.year) ? null : el.dataset.y; render(); });
+  if ($('#promo')) $('#promo').onclick = promoteSession;
+  if ($('#addC')) $('#addC').onclick = () => editClass();
+  if ($('#quick')) $('#quick').onclick = quickSetup;
+  $('#q').oninput = e => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) { $('#qres').innerHTML = ''; return; }
+    const r = S.students.filter(s => String(s.name).toLowerCase().includes(q) || String(s.roll) === q || phoneDigits(s.phone).includes(q)).slice(0, 30);
+    $('#qres').innerHTML = '<div class="list">' + (r.map(s => stuRow(s, true)).join('') || '<div class="empty">No match</div>') + '</div>';
+    bindStuRows($('#qres'));
+  };
+}
+function quickSetup() {
+  const defs = [['Class 7', 'Science'], ['Class 8', 'Science'], ['Class 9', 'Biology'], ['Class 10', 'Biology']];
+  sheet('Your 4 classes', '<p class="muted">Write the section you got in each class (e.g. A, B, Shapla…). Tick the one where you are Class Teacher.</p>' +
+    defs.map((d, i) => '<div class="row" style="margin:8px 0"><b style="width:74px">' + d[0] + '</b><span class="muted" style="width:62px">' + d[1] + '</span><input class="f grow" data-i="' + i + '" placeholder="Section"><label class="row small" style="gap:4px"><input type="radio" name="ct" value="' + i + '">CT</label></div>').join(''),
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Create', fn: el => {
+      const ct = ($('input[name=ct]:checked', el) || {}).value;
+      defs.forEach((d, i) => S.classes.push({id: uid(), year: S.settings.year, name: d[0], subject: d[1], section: $('input[data-i="' + i + '"]', el).value.trim(), ct: String(i) === ct, ctName: '', created: Date.now()}));
+      save(); render(); toast('Classes created');
+    }}]);
+}
+function editClass(c) {
+  const isNew = !c; c = c || {name: '', subject: '', section: '', ct: false, ctName: ''};
+  sheet(isNew ? 'Add class' : 'Edit class',
+    '<label class="l">Class</label><select class="f" id="cn">' + ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'Other'].map(x => '<option' + (x === c.name ? ' selected' : '') + '>' + x + '</option>').join('') + '</select>' +
+    '<input class="f" id="cnx" placeholder="Class name" style="margin-top:6px;' + (['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].includes(c.name) || isNew ? 'display:none' : '') + '" value="' + esc(c.name) + '">' +
+    '<div class="grid2"><div><label class="l">Section</label><input class="f" id="cs" value="' + esc(c.section) + '" placeholder="e.g. A"></div>' +
+    '<div><label class="l">Subject</label><input class="f" id="csub" list="subs" value="' + esc(c.subject) + '" placeholder="e.g. Biology"><datalist id="subs"><option>Science</option><option>Biology</option></datalist></div></div>' +
+    '<label class="l">Class Teacher of this section (name, for the marksheet)</label><input class="f" id="ctn" value="' + esc(c.ctName) + '">' +
+    '<label class="row" style="margin-top:12px"><input type="checkbox" id="ct" ' + (c.ct ? 'checked' : '') + '> <span>⭐ I am the Class Teacher of this section<br><span class="muted">Shows family info and weakness fields for its students</span></span></label>',
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Save', fn: el => {
+      let name = val(el, '#cn'); if (name === 'Other') name = val(el, '#cnx') || 'Class';
+      Object.assign(c, {name, section: val(el, '#cs'), subject: val(el, '#csub'), ctName: val(el, '#ctn'), ct: $('#ct', el).checked});
+      if (isNew) { c.id = uid(); c.created = Date.now(); c.year = viewYear || S.settings.year; S.classes.push(c); }
+      save(); render(); toast(isNew ? 'Class added' : 'Saved');
+    }}], el => { $('#cn', el).onchange = e => { $('#cnx', el).style.display = e.target.value === 'Other' ? '' : 'none'; }; });
+}
+
+/* ---------- NEW SESSION: promote classes to the next year ----------
+   Old year stays untouched (classes, students, marks, notes → still viewable & printable).
+   Each carried student gets a new record in the new class linked by prevId, so their history follows them. */
+function nextClassName(n) { const m = /^Class\s*(\d+)$/i.exec(n || ''); return m ? 'Class ' + (Number(m[1]) + 1) : n; }
+function promoteSession() {
+  const from = String(S.settings.year), to = String(Number(from) + 1);
+  const src = S.classes.filter(c => String(c.year) === from).sort((a, b) => (parseInt(/\d+/.exec(a.name) || 0) - parseInt(/\d+/.exec(b.name) || 0)));
+  if (!src.length) { toast('No classes in ' + from); return; }
+  const plan = src.map(c => ({c, to: nextClassName(c.name), section: c.section, carry: !/Class\s*10$/i.test(c.name), keep: new Set(studentsOf(c.id).map(s => s.id))}));
+  const draw = el => {
+    $('#pp', el).innerHTML = plan.map((p, i) => {
+      const list = studentsOf(p.c.id);
+      return '<div class="card" style="padding:10px"><label class="row"><input type="checkbox" data-carry="' + i + '" ' + (p.carry ? 'checked' : '') + '><b class="grow">' + esc(classLabel(p.c)) + ' (' + list.length + ')</b></label>' +
+        (p.carry ? '<div class="grid2" style="margin-top:6px"><div><label class="l">New class</label><input class="f" data-to="' + i + '" value="' + esc(p.to) + '"></div><div><label class="l">New section</label><input class="f" data-sec="' + i + '" value="' + esc(p.section) + '"></div></div>' +
+          '<details style="margin-top:8px"><summary class="small"><b>' + p.keep.size + '</b> of ' + list.length + ' moving up — untick who left / failed</summary>' +
+          list.map(s => '<label class="row small" style="margin:4px 0"><input type="checkbox" data-k="' + i + '" value="' + s.id + '" ' + (p.keep.has(s.id) ? 'checked' : '') + '><span class="roll" style="width:28px;height:28px;font-size:11px">' + esc(s.roll) + '</span><span class="grow">' + esc(s.name) + '</span></label>').join('') + '</details>'
+          : '<div class="muted small">Not carried (e.g. Class 10 finished). Its data stays in ' + from + '.</div>') + '</div>';
+    }).join('');
+    $$('[data-carry]', el).forEach(b => b.onchange = () => { plan[+b.dataset.carry].carry = b.checked; draw(el); });
+    $$('[data-to]', el).forEach(b => b.oninput = () => { plan[+b.dataset.to].to = b.value.trim(); });
+    $$('[data-sec]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sec].section = b.value.trim(); });
+    $$('[data-k]', el).forEach(b => b.onchange = () => { const k = plan[+b.dataset.k].keep; b.checked ? k.add(b.value) : k.delete(b.value); const sm = b.closest('details').querySelector('summary b'); sm.textContent = k.size; });
+  };
+  sheet('Start session ' + to, '<p class="muted small">Students move up with their names, phones and family info. Only class and section change. ' + from + ' data stays safe and viewable. After this, import the new official list to update rolls and add newcomers.</p>' +
+    '<label class="row small"><input type="checkbox" id="kr" checked> Keep old roll numbers for now</label><div id="pp" style="margin-top:10px"></div>',
+    [{label: 'Cancel', cls: 'sec'}, {label: '🎓 Start ' + to, fn: el => {
+      const keepRoll = $('#kr', el).checked;
+      const snap = JSON.stringify(S);
+      let moved = 0;
+      plan.filter(p => p.carry).forEach(p => {
+        const nc = {id: uid(), year: to, name: p.to || p.c.name, section: p.section, subject: p.c.subject, ct: false, ctName: '', created: Date.now(), prevClassId: p.c.id};
+        S.classes.push(nc);
+        studentsOf(p.c.id).filter(s => p.keep.has(s.id)).forEach(s => {
+          const n = JSON.parse(JSON.stringify(s));
+          Object.assign(n, {id: uid(), classId: nc.id, prevId: s.id, created: Date.now(), archived: false});
+          if (!keepRoll) n.roll = '';
+          S.students.push(n); moved++;
+        });
+      });
+      S.settings.year = to; viewYear = null;
+      save(); go('#/'); render();
+      toast(moved + ' students moved to ' + to, () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
+    }}], el => draw(el));
+}
+
+/* ---------- CLASS ---------- */
+let stuFilter = 'all', viewYear = null;
+function stuRow(s, showClass) {
+  const c = cls(s.classId), weak = isWeak(s);
+  return '<div class="li" data-s="' + s.id + '"><div class="roll">' + esc(s.roll || '–') + '</div><div class="grow"><div class="name">' + esc(s.name) + '</div>' +
+    '<div class="muted small">' + (showClass ? esc(classLabel(c)) + ' · ' : '') + (s.phone ? esc(s.phone) : 'no phone') +
+    (s.archived ? ' <span class="badge grey">removed</span>' : '') + (weak && !s.archived ? ' <span class="badge red">needs care</span>' : '') + '</div></div>' +
+    (s.phone ? '<a class="call" href="tel:' + esc(phoneDigits(s.phone)) + '" aria-label="Call guardian">📞</a>' : '') + '</div>';
+}
+function bindStuRows(root) {
+  $$('.li[data-s]', root).forEach(el => el.onclick = e => { if (e.target.closest('a')) return; go('#/student/' + el.dataset.s); });
+}
+function viewClass(c, tab) {
+  setHeader(classLabel(c), c.year + ' · ' + (c.subject || '') + (c.ct ? ' · ⭐ Class Teacher' : ''), '#/','<button class="ib" id="ce" aria-label="Edit class">✏️</button>');
+  $('#ce').onclick = () => classMenu(c);
+  const app = $('#app');
+  let html = '<div class="tabs"><button class="tab ' + (tab === 'students' ? 'on' : '') + '" data-t="students">👥 Students</button><button class="tab ' + (tab === 'marks' ? 'on' : '') + '" data-t="marks">📝 Marks & PDF</button></div>';
+  if (tab === 'marks') {
+    const n = studentsOf(c.id).length;
+    html += '<div class="muted" style="margin:0 2px 8px">Tap an exam to enter marks. PDF follows the school marksheet format.</div><div class="list">';
+    EXAMS.forEach(x => {
+      const m = S.marks[markKey(c.id, x.key)] || {}, done = studentsOf(c.id).filter(s => m[s.id] && m[s.id].total != null).length;
+      html += '<div class="li" data-x="' + x.key + '"><div class="roll" style="border-radius:10px;width:44px">' + x.short + '</div><div class="grow"><div class="name">' + esc(x.name) + '</div><div class="muted small">' + done + ' / ' + n + ' entered · full ' + (x.kind === 'pop' ? '3 × ' + S.settings.full.pop : fullOf(x)) + '</div></div>' +
+        '<button class="btn sm sec" data-pdf="' + x.key + '">PDF</button></div>';
+    });
+    html += '</div>';
+    app.innerHTML = html;
+    $$('.li[data-x]', app).forEach(el => el.onclick = e => { if (e.target.closest('[data-pdf]')) return; go('#/class/' + c.id + '/marks/' + el.dataset.x); });
+    $$('[data-pdf]', app).forEach(b => b.onclick = () => pdfDialog(c, EX[b.dataset.pdf]));
+  } else {
+    const all = studentsOf(c.id, true);
+    const shown = all.filter(s => stuFilter === 'removed' ? s.archived : !s.archived && (stuFilter !== 'weak' || isWeak(s)));
+    html += '<div class="search"><span>🔎</span><input class="f" id="q" placeholder="Search name / roll" autocomplete="off"></div>' +
+      '<div class="chips"><span class="chip ' + (stuFilter === 'all' ? 'on' : '') + '" data-f="all">All ' + all.filter(s => !s.archived).length + '</span><span class="chip ' + (stuFilter === 'weak' ? 'on' : '') + '" data-f="weak">Needs care ' + all.filter(s => !s.archived && isWeak(s)).length + '</span><span class="chip ' + (stuFilter === 'removed' ? 'on' : '') + '" data-f="removed">Removed ' + all.filter(s => s.archived).length + '</span></div>';
+    html += '<div class="list" id="sl">' + (shown.map(s => stuRow(s)).join('') || '<div class="empty">' + (all.length ? 'Nobody here' : 'No students yet.<br>Tap <b>＋</b> to add one, or import a list from a photo or a sheet.') + '</div>') + '</div>';
+    app.innerHTML = html;
+    bindStuRows(app);
+    $$('.chip', app).forEach(ch => ch.onclick = () => { stuFilter = ch.dataset.f; render(); });
+    $('#q').oninput = e => { const q = e.target.value.trim().toLowerCase(); $$('#sl .li', app).forEach(li => { const s = stu(li.dataset.s); li.style.display = !q || String(s.name).toLowerCase().includes(q) || String(s.roll) === q ? '' : 'none'; }); };
+    const fab = document.createElement('button'); fab.className = 'fab'; fab.textContent = '＋'; fab.setAttribute('aria-label', 'Add');
+    fab.onclick = () => sheet('Add students', '<div style="display:grid;gap:8px">' +
+      '<button class="btn full" id="a1">＋ Add one student</button>' +
+      '<button class="btn sec full" id="a2">📷 Import list from photo</button>' +
+      '<button class="btn sec full" id="a3">📄 Import Excel / CSV / Google Sheet file</button>' +
+      '<button class="btn sec full" id="a4">📋 Paste text list</button></div>', [], (el, close) => {
+        $('#a1', el).onclick = () => { close(); editStudent(null, c); };
+        $('#a2', el).onclick = () => { close(); importPhoto(c); };
+        $('#a3', el).onclick = () => { close(); importFile(c); };
+        $('#a4', el).onclick = () => { close(); importPaste(c); };
+      });
+    document.body.appendChild(fab);
+  }
+  $$('.tab', app).forEach(t => t.onclick = () => go('#/class/' + c.id + '/' + t.dataset.t));
+}
+function classMenu(c) {
+  sheet(classLabel(c), '<div style="display:grid;gap:8px"><button class="btn sec full" id="m1">✏️ Edit class / section / subject</button>' +
+    '<button class="btn red full" id="m3">🗑 Delete this class</button></div>', [], (el, close) => {
+    $('#m1', el).onclick = () => { close(); editClass(c); };
+    $('#m3', el).onclick = () => { close(); const n = S.students.filter(s => s.classId === c.id).length;
+      confirmBox('Delete ' + classLabel(c) + '?', 'This removes the class, its ' + n + ' students, their notes and marks. You can UNDO for a few seconds; a backup file is safer.', 'Delete', () => {
+        withUndo('Class deleted', () => {
+          const ids = new Set(S.students.filter(s => s.classId === c.id).map(s => s.id));
+          S.students = S.students.filter(s => s.classId !== c.id);
+          S.notes = S.notes.filter(n => !ids.has(n.studentId));
+          Object.keys(S.marks).forEach(k => { if (k.startsWith(c.id + '|')) delete S.marks[k]; });
+          S.classes = S.classes.filter(x => x.id !== c.id);
+          location.hash = '#/';
+        });
+      }); };
+  });
+}
+
+/* ---------- STUDENT ---------- */
+function editStudent(s, c) {
+  const isNew = !s; s = s || {classId: c.id, roll: '', name: '', phone: '', phone2: '', custom: {}};
+  c = cls(s.classId);
+  const cf = S.settings.customFields;
+  const fam = c && c.ct;
+  const f = (id, label, v, type = 'text', extra = '') => '<label class="l">' + label + '</label><input class="f" id="' + id + '" type="' + type + '" value="' + esc(v || '') + '" ' + extra + '>';
+  sheet(isNew ? 'Add student' : 'Edit student',
+    '<div class="grid2"><div>' + f('sr', 'Roll', s.roll, 'text', 'inputmode="numeric"') + '</div><div>' + f('sp', 'Guardian mobile', s.phone, 'tel') + '</div></div>' +
+    f('sn', 'Student name', s.name, 'text', 'autocapitalize="words"') +
+    '<div class="grid2"><div>' + f('sp2', 'Other mobile', s.phone2, 'tel') + '</div><div>' + f('sid', 'Student ID / Code', s.sid, 'text', 'inputmode="numeric"') + '</div></div>' +
+    (fam ? '<div class="hr"></div><div class="muted small"><b>⭐ Class-teacher info</b></div><div class="grid2"><div>' + f('fa', "Father's name", s.father) + '</div><div>' + f('fo', "Father's occupation", s.fOcc) + '</div><div>' + f('mo', "Mother's name", s.mother) + '</div><div>' + f('mocc', "Mother's occupation", s.mOcc) + '</div></div>' +
+      f('ad', 'Address', s.address) + '<label class="l">Weakness / special care</label><textarea class="f" id="wk" rows="2">' + esc(s.weakness || '') + '</textarea>' : '') +
+    (cf.length ? '<div class="hr"></div>' + cf.map((n, i) => f('cf' + i, esc(n), (s.custom || {})[n])).join('') : '') +
+    (!fam ? '<p class="muted small">Family info and weakness fields appear in the class where you are ⭐ Class Teacher.</p>' : ''),
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Save', fn: el => {
+      const name = val(el, '#sn'); if (!name) { toast('Name is needed'); return false; }
+      const roll = val(el, '#sr');
+      const dup = roll && S.students.find(x => x.classId === s.classId && !x.archived && String(x.roll) === roll && x !== s);
+      if (dup) { toast('Roll ' + roll + ' already belongs to ' + dup.name); return false; }
+      Object.assign(s, {roll, name, phone: val(el, '#sp'), phone2: val(el, '#sp2'), sid: val(el, '#sid')});
+      if (fam) Object.assign(s, {father: val(el, '#fa'), fOcc: val(el, '#fo'), mother: val(el, '#mo'), mOcc: val(el, '#mocc'), address: val(el, '#ad'), weakness: val(el, '#wk')});
+      s.custom = s.custom || {}; cf.forEach((n, i) => { s.custom[n] = val(el, '#cf' + i); });
+      if (isNew) { s.id = uid(); s.created = Date.now(); S.students.push(s); }
+      save(); render(); toast(isNew ? 'Student added' : 'Saved');
+    }}]);
+}
+function viewStudent(s) {
+  const c = cls(s.classId);
+  setHeader(s.name, classLabel(c) + ' · Roll ' + (s.roll || '–'), '#/class/' + c.id, '<button class="ib" id="se" aria-label="Edit">✏️</button>');
+  $('#se').onclick = () => editStudent(s);
+  const app = $('#app');
+  let html = '<div class="card"><div class="row"><div class="av ' + avClass(c) + '" style="width:54px;height:54px;font-size:19px">' + esc(initials(s.name)) + '</div><div class="grow"><div class="name" style="font-size:17px">' + esc(s.name) + '</div><div class="muted">' + esc(classLabel(c)) + ' · Roll ' + esc(s.roll || '–') + (s.archived ? ' <span class="badge grey">removed</span>' : '') + '</div></div></div>' +
+    '<div class="row wrap" style="margin-top:12px;gap:8px">' +
+    (s.phone ? '<a class="btn green" href="tel:' + esc(phoneDigits(s.phone)) + '">📞 Call guardian</a><a class="btn sec" href="https://wa.me/' + waNum(s.phone) + '" target="_blank" rel="noopener">💬 WhatsApp</a><a class="btn sec" href="sms:' + esc(phoneDigits(s.phone)) + '">✉️ SMS</a>' : '<span class="muted">No phone number — tap ✏️ to add</span>') +
+    (s.phone2 ? '<a class="btn sec" href="tel:' + esc(phoneDigits(s.phone2)) + '">📞 ' + esc(s.phone2) + '</a>' : '') + '</div></div>';
+  if (s.weakness) html += '<div class="warnbox"><b>Weakness / care:</b> ' + esc(s.weakness) + '</div>';
+  const kv = [];
+  if (s.sid) kv.push(['Student ID', s.sid]);
+  if (s.phone) kv.push(['Guardian', s.phone]);
+  if (s.father) kv.push(['Father', s.father + (s.fOcc ? ' (' + s.fOcc + ')' : '')]);
+  if (s.mother) kv.push(['Mother', s.mother + (s.mOcc ? ' (' + s.mOcc + ')' : '')]);
+  if (s.address) kv.push(['Address', s.address]);
+  Object.entries(s.custom || {}).forEach(([k, v]) => { if (v) kv.push([k, v]); });
+  if (kv.length) html += '<div class="card"><h3>Info</h3><div class="kv">' + kv.map(([k, v]) => '<div>' + esc(k) + '</div><div>' + esc(v) + '</div>').join('') + '</div></div>';
+  // marks
+  const rows = EXAMS.map(x => { const m = (S.marks[markKey(c.id, x.key)] || {})[s.id]; return {x, m, p: pct(c.id, x.key, s.id)}; }).filter(r => r.m && r.m.total != null);
+  html += '<div class="card"><h3>📊 Progress in ' + esc(c.subject || 'my subject') + '</h3>';
+  if (rows.length) {
+    html += '<div class="bars">' + rows.map(r => '<div class="bar"><b>' + Math.round(r.p) + '%</b><i class="' + (r.p < 40 ? 'low' : '') + '" style="height:' + Math.max(4, r.p) + '%"></i>' + r.x.short + '</div>').join('') + '</div>';
+    html += '<div style="margin-top:10px">' + rows.map(r => '<div class="row small" style="margin:4px 0"><span class="grow">' + esc(r.x.name) + '</span><b>' + (r.x.kind === 'pop' ? esc([r.m.p1, r.m.p2, r.m.p3].map(v => v === '-' ? 'Ab' : (v === '' || v == null ? '–' : v)).join(' / ')) + ' · avg ' + r.m.avg : esc(r.m.total) + ' / ' + fullOf(r.x)) + '</b></div>').join('') + '</div>';
+  } else html += '<div class="muted">No marks yet.</div>';
+  html += '</div>';
+  // notes
+  const notes = S.notes.filter(n => n.studentId === s.id).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.at - a.at));
+  html += '<div class="card"><div class="row"><h3 class="grow" style="margin:0">🗒 Notes (behaviour, study, progress)</h3><button class="btn sm" id="addN">＋ Note</button></div>' +
+    (notes.map(n => '<div class="note ' + esc(String(n.type).split(' ')[0]) + '" data-n="' + n.id + '"><div class="row small"><b>' + esc(n.type) + '</b>' + (n.rating ? '<span class="stars">' + '★'.repeat(n.rating) + '</span>' : '') + '<span class="muted right">' + fmtDate(n.date) + '</span></div>' + (n.text ? '<div style="white-space:pre-wrap">' + esc(n.text) + '</div>' : '') + '</div>').join('') || '<div class="muted" style="margin-top:8px">No notes yet. Write about behaviour, study habits, progress or anything else.</div>') + '</div>';
+  const past = []; let p = s.prevId && stu(s.prevId), guard = 0;
+  while (p && guard++ < 12) { past.push(p); p = p.prevId && stu(p.prevId); }
+  if (past.length) {
+    html += '<div class="card"><h3>📚 Earlier years</h3>' + past.map(o => {
+      const oc = cls(o.classId) || {};
+      const ex = EXAMS.map(x => ({x, p: pct(o.classId, x.key, o.id)})).filter(r => r.p != null);
+      const nn = S.notes.filter(n => n.studentId === o.id).sort((a, b) => a.date < b.date ? 1 : -1);
+      return '<div style="margin:8px 0"><div class="row"><b class="grow">' + esc(oc.year || '') + ' · ' + esc(classLabel(oc)) + '</b><span class="muted small">Roll ' + esc(o.roll || '–') + '</span></div>' +
+        (ex.length ? '<div class="small">' + ex.map(r => r.x.short + ' ' + Math.round(r.p) + '%').join(' · ') + '</div>' : '') +
+        nn.slice(0, 5).map(n => '<div class="note ' + esc(String(n.type).split(' ')[0]) + ' small"><b>' + esc(n.type) + '</b> · ' + fmtDate(n.date) + (n.text ? ' — ' + esc(n.text) : '') + '</div>').join('') +
+        (nn.length > 5 ? '<a class="small" href="#/student/' + o.id + '">All ' + nn.length + ' notes ›</a>' : '') + '</div>';
+    }).join('<div class="hr"></div>') + '</div>';
+  }
+  html += '<div class="card"><h3>Manage</h3><div style="display:grid;gap:8px"><button class="btn sec full" id="mv">↔️ Move to another class / section</button>' +
+    (s.archived ? '<button class="btn green full" id="ar">↩️ Bring back to class list</button>' : '<button class="btn sec full" id="ar">📦 Remove from list (TC / left) — keeps data</button>') +
+    '<button class="btn red full" id="del">🗑 Delete permanently</button></div></div>';
+  app.innerHTML = html;
+  $('#addN').onclick = () => editNote(null, s);
+  $$('.note[data-n]', app).forEach(el => el.onclick = () => editNote(S.notes.find(n => n.id === el.dataset.n), s));
+  $('#ar').onclick = () => withUndo(s.archived ? 'Back in the list' : 'Removed from list', () => { s.archived = !s.archived; });
+  $('#mv').onclick = () => sheet('Move ' + s.name, '<label class="l">New class / section</label><select class="f" id="to">' + S.classes.map(x => '<option value="' + x.id + '"' + (x.id === s.classId ? ' selected' : '') + '>' + esc(classLabel(x)) + ' (' + esc(x.subject) + ')</option>').join('') + '</select><p class="muted small">Marks stay with the old class; notes move with the student.</p>',
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Move', fn: el => { const to = $('#to', el).value; if (to !== s.classId) withUndo('Moved', () => { s.classId = to; }); }}]);
+  $('#del').onclick = () => confirmBox('Delete ' + s.name + '?', 'Deletes the student, notes and marks. Use “Remove from list” if you only want to hide them.', 'Delete', () => {
+    withUndo('Student deleted', () => {
+      S.students = S.students.filter(x => x.id !== s.id); S.notes = S.notes.filter(n => n.studentId !== s.id);
+      Object.values(S.marks).forEach(m => delete m[s.id]); location.hash = '#/class/' + c.id;
+    });
+  });
+}
+function editNote(n, s) {
+  const isNew = !n; n = n || {studentId: s.id, date: today(), type: S.settings.noteTypes[0] || 'Behaviour', rating: 0, text: ''};
+  let rating = n.rating || 0;
+  sheet(isNew ? 'New note · ' + s.name : 'Edit note',
+    '<div class="grid2"><div><label class="l">Type</label><select class="f" id="nt">' + S.settings.noteTypes.concat(S.settings.noteTypes.includes(n.type) ? [] : [n.type]).map(t => '<option' + (t === n.type ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select></div>' +
+    '<div><label class="l">Date</label><input class="f" type="date" id="nd" value="' + esc(n.date) + '"></div></div>' +
+    '<label class="l">Rating (optional)</label><div class="starpick" id="sp">' + [1, 2, 3, 4, 5].map(i => '<button type="button" data-r="' + i + '">★</button>').join('') + '<button type="button" data-r="0" class="small" style="font-size:13px;color:var(--muted)">clear</button></div>' +
+    '<label class="l">Note</label><textarea class="f" id="nx" rows="4" placeholder="What happened / what to improve">' + esc(n.text) + '</textarea>',
+    [isNew ? {label: 'Cancel', cls: 'sec'} : {label: '🗑 Delete', cls: 'red', fn: () => withUndo('Note deleted', () => { S.notes = S.notes.filter(x => x.id !== n.id); })},
+      {label: 'Save', fn: el => {
+        Object.assign(n, {type: val(el, '#nt'), date: val(el, '#nd') || today(), text: $('#nx', el).value.trim(), rating});
+        if (!n.text && !n.rating) { toast('Write something or give a rating'); return false; }
+        if (isNew) { n.id = uid(); n.at = Date.now(); S.notes.push(n); }
+        save(); render(); toast('Note saved');
+      }}], el => {
+      const paint = () => $$('#sp button[data-r]', el).forEach(b => b.classList.toggle('on', +b.dataset.r > 0 && +b.dataset.r <= rating));
+      $$('#sp button', el).forEach(b => b.onclick = () => { rating = +b.dataset.r; paint(); }); paint();
+    });
+}
+
+/* ---------- MARKS ENTRY ---------- */
+let moveDir = 'row';
+function viewMarks(c, ex) {
+  setHeader(ex.name, classLabel(c) + ' · ' + (c.subject || ''), '#/class/' + c.id + '/marks', '<button class="ib" id="pdfB" aria-label="PDF">🖨️</button>');
+  $('#pdfB').onclick = () => pdfDialog(c, ex);
+  const list = studentsOf(c.id), M = marksOf(c.id, ex.key), cols = colsOf(ex), outs = outColsOf(ex);
+  const full = fullOf(ex), cellMax = ex.kind === 'pop' ? full : full;
+  const app = $('#app');
+  if (!list.length) { app.innerHTML = '<div class="empty">Add students to this class first.</div>'; return; }
+  app.innerHTML = '<div class="row small muted" style="margin:0 2px 8px;flex-wrap:wrap">Full: ' + (ex.kind === 'pop' ? S.settings.full.pop + ' each' : full) + ' · type <b>-</b> for absent · Next box: ' +
+    '<span class="chip ' + (moveDir === 'row' ? 'on' : '') + '" data-d="row">→ across</span><span class="chip ' + (moveDir === 'col' ? 'on' : '') + '" data-d="col">↓ down</span></div>' +
+    '<div class="mkwrap"><table class="mk"><thead><tr><th>Roll</th><th style="text-align:left">Name</th>' + cols.map(x => '<th>' + x.label + '</th>').join('') + outs.map(x => '<th>' + x.label + '</th>').join('') + '</tr></thead><tbody>' +
+    list.map((s, r) => { const m = M[s.id] || {}; return '<tr data-s="' + s.id + '"><td><b>' + esc(s.roll) + '</b></td><td class="nm">' + esc(s.name) + '</td>' +
+      cols.map((x, ci) => '<td><input data-r="' + r + '" data-c="' + ci + '" data-k="' + x.k + '" ' + (x.num ? 'inputmode="decimal"' : '') + ' value="' + esc(m[x.k] == null ? '' : m[x.k]) + '" autocomplete="off"></td>').join('') +
+      outs.map(x => '<td class="tot" data-o="' + x.k + '">' + esc(m[x.k] == null ? '' : m[x.k]) + '</td>').join('') + '</tr>'; }).join('') +
+    '</tbody></table></div><div class="row" style="margin-top:12px"><span class="muted small grow" id="cnt"></span><button class="btn" id="pdf2">🖨️ Make PDF</button></div>';
+  const count = () => { $('#cnt').textContent = list.filter(s => M[s.id] && M[s.id].total != null).length + ' / ' + list.length + ' entered · saved automatically'; };
+  count();
+  $$('.chip', app).forEach(ch => ch.onclick = () => { moveDir = ch.dataset.d; $$('.chip', app).forEach(x => x.classList.toggle('on', x === ch)); });
+  $('#pdf2').onclick = () => pdfDialog(c, ex);
+  const check = inp => {
+    const k = inp.dataset.k, v = inp.value.trim();
+    let bad = false;
+    if (colsOf(ex).find(x => x.k === k).num && v !== '' && v !== '-') { const n = Number(v); bad = isNaN(n) || n < 0 || n > cellMax; }
+    inp.classList.toggle('bad', bad); return !bad;
+  };
+  $$('table.mk input', app).forEach(inp => {
+    check(inp);
+    inp.addEventListener('input', () => {
+      const tr = inp.closest('tr'), sid = tr.dataset.s, m = M[sid] || (M[sid] = {});
+      const v = inp.value.trim();
+      if (v === '') delete m[inp.dataset.k]; else m[inp.dataset.k] = v;
+      calc(ex, m);
+      const over = ex.kind === 'main' && m.total != null && m.total > full;
+      $$('input', tr).forEach(x => { if (!check(x) || !colsOf(ex).find(cc => cc.k === x.dataset.k).num) return; x.classList.toggle('bad', over); });
+      outs.forEach(o => { $('[data-o="' + o.k + '"]', tr).textContent = m[o.k] == null ? '' : m[o.k]; });
+      if (!Object.keys(m).length) delete M[sid];
+      save(true); count();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key !== 'Enter') return; e.preventDefault();
+      const r = +inp.dataset.r, ci = +inp.dataset.c, nc = cols.length;
+      const next = moveDir === 'col' ? $('input[data-r="' + (r + 1) + '"][data-c="' + ci + '"]', app) || $('input[data-r="0"][data-c="' + (ci + 1) + '"]', app)
+        : $('input[data-r="' + r + '"][data-c="' + (ci + 1) + '"]', app) || $('input[data-r="' + (r + 1) + '"][data-c="0"]', app);
+      if (next) { next.focus(); next.select(); } else inp.blur();
+      void nc;
+    });
+    inp.addEventListener('focus', () => inp.select());
+  });
+}
+
+/* =========================================================
+   IMPORT: photo (OCR) · file (Excel/CSV) · pasted text
+   ========================================================= */
+/** Turn free text lines into {roll,name,phone} rows. */
+function parseLines(text) {
+  const out = [];
+  String(text || '').split(/\r?\n/).forEach(raw => {
+    let line = raw.replace(/[|_]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!line) return;
+    if (/^(sl|s\.?l\.?|roll|name|serial)\b/i.test(line) && /name/i.test(line)) return;
+    if (/^(page|total|class|section|subject|session)\b/i.test(line)) return;
+    line = line.replace(/(?<=\d)[Oo](?=\d)/g, '0');
+    let phone = '';
+    const pm = /(?:\+?\s?88[\s-]?)?0?1[3-9](?:[\s-]?\d){8}(?!\d)/.exec(line);
+    if (pm) { phone = pm[0].replace(/[^\d+]/g, ''); line = line.replace(pm[0], ' '); if (/^1/.test(phone)) phone = '0' + phone; }
+    let roll = '';
+    const nums = line.match(/\b\d{1,4}\b/g) || [];
+    if (nums.length >= 2 && /^\s*\d{1,3}[.)]?\s/.test(line)) roll = nums[1]; // "SL. Roll Name" style → second number is roll
+    else if (nums.length) roll = nums[0];
+    let name = line.replace(/\b\d+\b/g, ' ').replace(/[^A-Za-z.\-' ]/g, ' ').replace(/\s+/g, ' ').trim().replace(/^[.\-' ]+|[.\-' ]+$/g, '');
+    if (name.replace(/[^A-Za-z]/g, '').length < 3) return;
+    if (name === name.toUpperCase()) name = name.toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase());
+    out.push({roll, name, phone, ok: true});
+  });
+  return out;
+}
+function reviewImport(c, rows, extraNote = '') {
+  if (!rows.length) { toast('No names found. Try a clearer photo or paste text.'); return; }
+  const existing = studentsOf(c.id, true);
+  const findEx = r => (r.sid && existing.find(s => s.sid && String(s.sid) === String(r.sid))) || (r.roll && !r.sid && existing.find(s => String(s.roll) === String(r.roll))) || (r.roll && r.sid && existing.find(s => !s.sid && String(s.roll) === String(r.roll)));
+  const draw = el => {
+    $('#rv', el).innerHTML = rows.map((r, i) => {
+      const ex = findEx(r);
+      return '<div class="ocrrow" data-i="' + i + '"><input type="checkbox" ' + (r.ok ? 'checked' : '') + ' data-f="ok"><input class="f" data-f="roll" value="' + esc(r.roll) + '" placeholder="Roll" inputmode="numeric"><input class="f" data-f="name" value="' + esc(r.name) + '" placeholder="Name"><input class="f" data-f="phone" value="' + esc(r.phone) + '" placeholder="Mobile" inputmode="tel"><button class="ib" style="color:var(--bad);width:30px" data-del title="Remove row">✕</button>' +
+        (ex ? '<div class="small" style="grid-column:2/6;color:var(--warn);margin-top:-4px">Already in class (' + esc(ex.name) + (String(ex.roll) !== String(r.roll) ? ', roll ' + esc(ex.roll) + ' → ' + esc(r.roll) : '') + ') → will be updated</div>' : '') + '</div>';
+    }).join('') + '<button class="btn sec sm" id="addRow">＋ Add row</button>';
+    $$('.ocrrow', el).forEach(row => {
+      const r = rows[+row.dataset.i];
+      $$('[data-f]', row).forEach(inp => inp.oninput = inp.onchange = () => { r[inp.dataset.f] = inp.type === 'checkbox' ? inp.checked : inp.value.trim(); });
+      $('[data-del]', row).onclick = () => { rows.splice(+row.dataset.i, 1); draw(el); };
+    });
+    $('#addRow', el).onclick = () => { rows.push({roll: '', name: '', phone: '', ok: true}); draw(el); };
+  };
+  sheet('Check the list (' + rows.length + ')', '<p class="muted small">Read carefully and correct any mistakes. Unticked rows are skipped. Same Student ID (or same roll) = update.' + extraNote + '</p>' +
+    (existing.filter(s => !s.archived).length ? '<label class="row small" style="margin-bottom:10px"><input type="checkbox" id="mm"> Students already in this class but <b>not</b> in this list have left → mark them removed</label>' : '') + '<div id="rv"></div>',
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Save to ' + esc(classLabel(c)), fn: el => {
+      let add = 0, upd = 0, gone = 0;
+      const snap = JSON.stringify(S), seen = new Set();
+      rows.filter(r => r.ok && r.name).forEach(r => {
+        const ex = findEx(r);
+        if (ex) { ['sid', 'roll', 'name', 'phone', 'phone2', 'father', 'fOcc', 'mother', 'mOcc', 'address', 'weakness'].forEach(k => { if (r[k]) ex[k] = r[k]; }); if (r.custom) ex.custom = Object.assign(ex.custom || {}, r.custom); ex.archived = false; seen.add(ex.id); upd++; }
+        else { const n = Object.assign({id: uid(), classId: c.id, created: Date.now(), custom: {}}, {sid: r.sid || '', roll: r.roll, name: r.name, phone: r.phone || '', phone2: r.phone2 || '', father: r.father || '', fOcc: r.fOcc || '', mother: r.mother || '', mOcc: r.mOcc || '', address: r.address || '', weakness: r.weakness || '', custom: r.custom || {}}); S.students.push(n); seen.add(n.id); add++; }
+      });
+      if ($('#mm', el) && $('#mm', el).checked) existing.forEach(s => { if (!s.archived && !seen.has(s.id)) { s.archived = true; gone++; } });
+      save(); render(); toast(add + ' added, ' + upd + ' updated' + (gone ? ', ' + gone + ' marked left' : ''), () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
+    }}], el => draw(el));
+}
+function pickFile(accept, capture) {
+  return new Promise(res => {
+    const i = document.createElement('input'); i.type = 'file'; i.accept = accept; if (capture) i.capture = 'environment';
+    i.onchange = () => res(i.files[0] || null); i.click();
+  });
+}
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load ' + src.split('/').pop() + ' (internet needed)')); document.head.appendChild(s); }); }
+async function prepImage(file) {
+  const img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(file); });
+  const scale = Math.min(2.2, Math.max(1, 1800 / img.width));
+  const cv = document.createElement('canvas'); cv.width = Math.round(img.width * scale); cv.height = Math.round(img.height * scale);
+  const g = cv.getContext('2d'); g.drawImage(img, 0, 0, cv.width, cv.height);
+  const d = g.getImageData(0, 0, cv.width, cv.height), p = d.data;
+  for (let i = 0; i < p.length; i += 4) { let y = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; y = (y - 128) * 1.5 + 128; y = y < 0 ? 0 : y > 255 ? 255 : y; p[i] = p[i + 1] = p[i + 2] = y; }
+  g.putImageData(d, 0, 0); URL.revokeObjectURL(img.src);
+  return cv;
+}
+async function importPhoto(c) {
+  const file = await pickFile('image/*');
+  if (!file) return;
+  const box = sheet('Reading photo…', '<p class="muted">Reading names and numbers. This needs internet the first time (~10 MB) and can take 20–60 seconds.</p><div class="pill" id="prog">Starting…</div>');
+  try {
+    if (!window.Tesseract) await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    const worker = await Tesseract.createWorker('eng', 1, {logger: m => { const p = $('#prog', box.el); if (p && m.status) p.textContent = m.status + (m.progress ? ' ' + Math.round(m.progress * 100) + '%' : ''); }});
+    await worker.setParameters({preserve_interword_spaces: '1'});
+    const cv = await prepImage(file);
+    const {data} = await worker.recognize(cv);
+    await worker.terminate();
+    box.close();
+    reviewImport(c, parseLines(data.text), ' Photo reading is never perfect — check each name and number.');
+  } catch (e) { box.close(); toast('⚠️ ' + e.message); }
+}
+function importPaste(c) {
+  sheet('Paste a list', '<p class="muted small">One student per line, e.g. <code>12 Rahim Uddin 017XXXXXXXX</code>. Tip: Google Lens → Copy text from a photo, then paste here.</p><textarea class="f" id="px" rows="10" placeholder="1  Abdullah Al Mamun  017XXXXXXXX"></textarea>',
+    [{label: 'Cancel', cls: 'sec'}, {label: 'Next', fn: el => { const rows = parseLines($('#px', el).value); setTimeout(() => reviewImport(c, rows), 50); }}]);
+}
+const FIELD_GUESS = [
+  ['sid', /std\.?\s*code|student\s*(code|id)|^id$|^code$/i],
+  ['roll', /roll|রোল/i], ['name', /name|নাম/i], ['phone', /guardian|mobile|phone|contact|cell|মোবাইল|ফোন/i], ['phone2', /phone ?2|other|alt|student mobile|std\.? ?cont/i],
+  ['father', /father|পিতা|বাবা/i], ['fOcc', /father.*(occ|prof|job)/i], ['mother', /mother|মাতা|মা/i], ['mOcc', /mother.*(occ|prof|job)/i],
+  ['address', /address|ঠিকানা|village/i], ['weakness', /weak|দুর্বল/i]];
+const FIELD_LABELS = {sid: 'Student ID / Code', roll: 'Roll', name: 'Name', phone: 'Guardian mobile', phone2: 'Other mobile', father: "Father's name", fOcc: "Father's occupation", mother: "Mother's name", mOcc: "Mother's occupation", address: 'Address', weakness: 'Weakness'};
+async function importFile(c) {
+  const file = await pickFile('.xlsx,.xls,.csv,.ods,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  if (!file) return;
+  try {
+    if (!window.XLSX) await loadScript('vendor/xlsx.full.min.js');
+    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    let rows = XLSX.utils.sheet_to_json(ws, {header: 1, raw: false, defval: ''}).filter(r => r.some(v => String(v).trim()));
+    if (!rows.length) { toast('The sheet is empty'); return; }
+    // header row = first row that has a "name"-like cell
+    let hi = rows.findIndex(r => r.some(v => /name|নাম/i.test(v))); if (hi < 0) hi = -1;
+    const head = hi >= 0 ? rows[hi].map(String) : rows[0].map((_, i) => 'Column ' + (i + 1));
+    const data = rows.slice(hi + 1);
+    const map = {};
+    Object.keys(FIELD_LABELS).forEach(f => { map[f] = -1; });
+    // assign best guesses, occupation patterns before plain father/mother
+    ['sid', 'fOcc', 'mOcc', 'phone2', 'roll', 'name', 'phone', 'father', 'mother', 'address', 'weakness'].forEach(f => {
+      const re = FIELD_GUESS.find(g => g[0] === f)[1];
+      const i = head.findIndex((h, j) => re.test(h) && !Object.values(map).includes(j));
+      if (i >= 0) map[f] = i;
+    });
+    if (map.name < 0 && hi < 0) { map.roll = 0; map.name = 1; map.phone = 2; }
+    const cf = S.settings.customFields;
+    const opt = sel => '<option value="-1">— skip —</option>' + head.map((h, i) => '<option value="' + i + '"' + (i === sel ? ' selected' : '') + '>' + esc(h || 'Column ' + (i + 1)) + '</option>').join('');
+    sheet('Match the columns', '<p class="muted small">' + data.length + ' rows found in “' + esc(wb.SheetNames[0]) + '”. Tell the app which column is which.</p>' +
+      Object.keys(FIELD_LABELS).map(f => '<div class="row" style="margin:6px 0"><span style="width:150px" class="small">' + FIELD_LABELS[f] + '</span><select class="f grow" data-f="' + f + '">' + opt(map[f]) + '</select></div>').join('') +
+      cf.map((n, k) => '<div class="row" style="margin:6px 0"><span style="width:150px" class="small">' + esc(n) + '</span><select class="f grow" data-cf="' + k + '">' + opt(head.findIndex(h => h.toLowerCase() === n.toLowerCase())) + '</select></div>').join(''),
+      [{label: 'Cancel', cls: 'sec'}, {label: 'Next', fn: el => {
+        $$('[data-f]', el).forEach(s => map[s.dataset.f] = +s.value);
+        if (map.name < 0) { toast('Choose the Name column'); return false; }
+        const cfm = $$('[data-cf]', el).map(s => +s.value);
+        const out = data.map(r => {
+          const o = {ok: true, custom: {}};
+          Object.keys(FIELD_LABELS).forEach(f => { o[f] = map[f] >= 0 ? String(r[map[f]] || '').trim() : ''; });
+          cfm.forEach((ci, k) => { if (ci >= 0) o.custom[cf[k]] = String(r[ci] || '').trim(); });
+          if (o.phone && /^1[3-9]\d{8}$/.test(o.phone)) o.phone = '0' + o.phone;
+          return o;
+        }).filter(o => o.name);
+        setTimeout(() => reviewImport(c, out), 50);
+      }}]);
+  } catch (e) { toast('⚠️ ' + e.message); }
+}
+
+/* =========================================================
+   PDF MARKSHEETS (school format)
+   ========================================================= */
+let logoData = null;
+async function getLogo() {
+  if (logoData) return logoData;
+  const img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = 'logo.png'; });
+  const cv = document.createElement('canvas'); cv.width = cv.height = 300;
+  const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, 300, 300); g.drawImage(img, 0, 0, 300, 300);
+  const d = g.getImageData(0, 0, 300, 300), p = d.data;
+  for (let i = 0; i < p.length; i += 4) { const y = 0.299 * p[i] + 0.587 * p[i + 1] + 0.114 * p[i + 2]; p[i] = p[i + 1] = p[i + 2] = y; }
+  g.putImageData(d, 0, 0);
+  return (logoData = cv.toDataURL('image/jpeg', 0.88));
+}
+function pdfDialog(c, ex) {
+  sheet('PDF · ' + ex.name, '<p class="muted small">' + esc(classLabel(c)) + ' · A4, black & white, same layout as the school marksheet.</p>' +
+    '<label class="l">' + (ex.kind === 'pop' ? 'Marks of Pop Test ( … )' : 'Marksheet of … Examination') + '</label><input class="f" id="pt" value="' + esc(ex.print) + '">' +
+    '<div class="grid2"><div><label class="l">Year</label><input class="f" id="py" inputmode="numeric" value="' + esc(S.settings.year) + '"></div><div><label class="l">Subject</label><input class="f" id="ps" value="' + esc(c.subject) + '"></div></div>' +
+    '<label class="l">Subject Teacher</label><input class="f" id="pst" value="' + esc(S.settings.teacher) + '">' +
+    '<label class="l">Class Teacher</label><input class="f" id="pct" value="' + esc(c.ctName || (c.ct ? S.settings.teacher : '')) + '">' +
+    '<label class="row small" style="margin-top:10px"><input type="checkbox" id="pb"> Leave marks blank (empty form with names only)</label>',
+    [{label: '💾 Save PDF', cls: 'sec', fn: el => makePdf(c, ex, el, 'save')}, {label: '🖨️ Share / Print', fn: el => makePdf(c, ex, el, 'share')}]);
+}
+async function makePdf(c, ex, el, mode) {
+  if (!window.jspdf) { toast('PDF tool still loading, try again'); return false; }
+  const o = {title: val(el, '#pt'), year: val(el, '#py'), subject: val(el, '#ps'), st: val(el, '#pst'), ctn: val(el, '#pct'), blank: $('#pb', el).checked};
+  c.ctName = c.ctName || (o.ctn !== S.settings.teacher ? o.ctn : c.ctName);
+  if (o.st && !S.settings.teacher) S.settings.teacher = o.st;
+  save(true);
+  const doc = ex.kind === 'pop' ? await popPdf(c, ex, o) : await mainPdf(c, ex, o);
+  doc.setProperties({title: ex.name + ' · ' + classLabel(c) + ' · ' + o.year, subject: o.subject || '', author: AUTHOR.name, creator: 'BAFSB · ' + AUTHOR.name + ', ' + AUTHOR.role, keywords: 'BAFSB'});
+  const name = ('Marks_' + c.name + '_' + (c.section || '') + '_' + ex.short + '_' + o.year).replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf';
+  if (NATIVE) {
+    const b64 = doc.output('datauristring').split(',')[1];
+    if (mode === 'share' && 'shareFile' in AndroidApp) AndroidApp.shareFile(b64, name, 'application/pdf');
+    else { const m = AndroidApp.saveFile(b64, name, 'application/pdf'); if (m) toast(m); }
+  } else if (mode === 'share') {
+    const blob = doc.output('blob');
+    try { if (navigator.canShare && navigator.canShare({files: [new File([blob], name, {type: 'application/pdf'})]})) { await navigator.share({files: [new File([blob], name, {type: 'application/pdf'})], title: name}); return; } } catch (e) { if (e.name === 'AbortError') return; }
+    window.open(URL.createObjectURL(blob), '_blank');
+  } else doc.save(name);
+}
+/** shared header: logo + school + exam line + class/section; returns y after header */
+async function pdfHeader(doc, line2, o, c) {
+  const logo = await getLogo();
+  doc.addImage(logo, 'JPEG', 15, 12, 22, 22, 'bafsb-logo');
+  doc.setFont('times', 'bold'); doc.setFontSize(16.5); doc.text(SCHOOL, 42, 18);
+  doc.setFont('times', 'normal'); doc.setFontSize(12.5);
+  doc.text(line2, 42, 25);
+  doc.text('Class: ' + (c.name || '').replace(/^Class\s*/i, '') + ',  Section: ' + (c.section || ''), 42, 31.5);
+  doc.setFont('times', 'bold'); doc.setFontSize(11);
+  doc.text('Subject: ' + (o.subject || ''), 13, 42);
+  doc.text('Subject-Teacher: ' + (o.st || ''), 66, 42);
+  doc.text('Class-Teacher: ' + (o.ctn || ''), 140, 42);
+  return 44.5;
+}
+function cellText(doc, txt, x, w, y, h, align, size, fit) {
+  doc.setFontSize(size);
+  let t = String(txt == null ? '' : txt);
+  if (fit) while (size > 6.5 && doc.getTextWidth(t) > w - 1.6) { size -= 0.25; doc.setFontSize(size); }
+  while (t.length > 1 && doc.getTextWidth(t) > w - 2.4) t = t.slice(0, -1);
+  const ty = y + h / 2 + size * 0.125;
+  if (align === 'left') doc.text(t, x + 1.4, ty); else doc.text(t, x + w / 2, ty, {align: 'center'});
+}
+function drawTable(doc, x0, y0, widths, rowH, headH, head, rows, opts = {}) {
+  const W = widths.reduce((a, b) => a + b, 0);
+  doc.setLineWidth(0.25);
+  doc.setFont('times', 'bold');
+  let x = x0; head.forEach((h, i) => { cellText(doc, h, x, widths[i], y0, headH, 'center', opts.headSize || 11, true); x += widths[i]; });
+  doc.setFont('times', 'normal');
+  rows.forEach((r, ri) => {
+    const y = y0 + headH + ri * rowH; x = x0;
+    r.forEach((v, i) => { cellText(doc, v, x, widths[i], y, rowH, (opts.left || []).includes(i) ? 'left' : 'center', opts.size || 10.5, (opts.left || []).includes(i)); x += widths[i]; });
+  });
+  const H = headH + rows.length * rowH;
+  doc.rect(x0, y0, W, H);
+  doc.line(x0, y0 + headH, x0 + W, y0 + headH);
+  for (let i = 1; i < rows.length; i++) doc.line(x0, y0 + headH + i * rowH, x0 + W, y0 + headH + i * rowH);
+  x = x0; widths.slice(0, -1).forEach(w => { x += w; doc.line(x, y0, x, y0 + H); });
+  return y0 + H;
+}
+const fmtMark = v => v === '-' ? 'Ab' : (v == null ? '' : v);
+async function mainPdf(c, ex, o) {
+  const {jsPDF} = window.jspdf; const doc = new jsPDF({unit: 'mm', format: 'a4'});
+  const list = studentsOf(c.id), M = S.marks[markKey(c.id, ex.key)] || {};
+  const total = Math.max(65, list.length);
+  const rows = []; for (let i = 0; i < total; i++) { const s = list[i]; const m = (s && !o.blank && M[s.id]) || {};
+    rows.push([(i + 1) + '.', s ? m.code || '' : '', s ? m.codeMark || '' : '', s ? s.name : '', s ? s.roll : '', fmtMark(m.cq), fmtMark(m.mcq), m.total == null ? '' : m.total]); }
+  const widths = [11, 19, 20, 66, 17, 18, 18, 17], head = ['SL', 'Code No.', "Code's Mark", 'Name of Students', 'Roll', 'CQ', 'MCQ', 'Total'];
+  const y = await pdfHeader(doc, 'Marksheet of  ' + (o.title || '') + '  Examination-' + o.year, o, c);
+  drawTable(doc, 12, y, widths, 6.55, 7.5, head, rows.slice(0, 35), {left: [3]});
+  let i = 35;
+  while (i < rows.length) {
+    doc.addPage();
+    const left = rows.length - i, take = left <= 33 ? left : 30; // up to 33 rows fit with the signature boxes
+    const chunk = rows.slice(i, i + take); i += take;
+    const rh = Math.min(6.9, (i >= rows.length ? 212 : 262) / chunk.length);
+    const end = drawTable(doc, 12, 14, widths, rh, 7.5, head, chunk, {left: [3]});
+    if (i >= rows.length) signBoxes(doc, Math.max(end + 10, 240));
+  }
+  return doc;
+}
+function signBoxes(doc, y) {
+  const T = [['Assessed by 1st Examiner:', 'Exam Paper assessed,', 'number counted and filled-', "up mark's entry Paper."],
+    ['Verified by 2nd Examiner:', 'All Exam Paper and total', 'marks counted, Checked', 'and found Correct then.'],
+    ['Class Teacher:', 'Input Number', 'checked and', 'found Correct.'],
+    ['Opposite Section', 'Class Teacher:', 'Input Number checked', 'and found Correct.'],
+    ['In charge:', 'Finally verified', 'and found', 'correct.']];
+  const ws = [40, 40, 32, 38, 32], gap = 1.5, h = 34; let x = 12;
+  doc.setLineWidth(0.3);
+  T.forEach((lines, k) => {
+    doc.rect(x, y, ws[k], h);
+    lines.forEach((t, j) => { const bold = j === 0 || (k === 3 && j === 1); doc.setFont('times', bold ? 'bold' : 'normal'); doc.setFontSize(9.5); doc.text(t, x + ws[k] / 2, y + 5 + j * 4, {align: 'center'}); });
+    x += ws[k] + gap;
+  });
+}
+async function popPdf(c, ex, o) {
+  const {jsPDF} = window.jspdf; const doc = new jsPDF({unit: 'mm', format: 'a4'});
+  const list = studentsOf(c.id), M = S.marks[markKey(c.id, ex.key)] || {};
+  const per = 36, total = Math.max(per, Math.ceil(list.length / per) * per);
+  const rows = []; for (let i = 0; i < total; i++) { const s = list[i]; const m = (s && !o.blank && M[s.id]) || {};
+    rows.push([(i + 1) + '.', s ? s.name : '', s ? s.roll : '', fmtMark(m.p1), fmtMark(m.p2), fmtMark(m.p3), m.total == null ? '' : m.total, m.avg == null ? '' : m.avg]); }
+  const widths = [11, 61, 18, 20, 20, 20, 21, 15 + 0], head = ['SL', 'Name of Students', 'Roll', 'Pop Test-1', 'Pop Test-2', 'Pop Test-3', 'Total Mark', 'Average'];
+  widths[7] = 186 - widths.slice(0, 7).reduce((a, b) => a + b, 0);
+  for (let p = 0; p * per < total; p++) {
+    if (p) doc.addPage();
+    const y = await pdfHeader(doc, 'Marks of Pop Test ( ' + (o.title || '') + ' )-' + o.year, o, c);
+    drawTable(doc, 12, y, widths, 6.4, 7.5, head, rows.slice(p * per, p * per + per), {left: [1]});
+  }
+  return doc;
+}
+
+/* =========================================================
+   EVENTS: exam dates · mark-submission deadlines · class routine
+   ========================================================= */
+const EVT = {exam: '📝 Exam', deadline: '⏰ Marks deadline', routine: '🕘 Class routine', other: '📌 Other'};
+function evTitle(e) {
+  const c = cls(e.classId);
+  if (e.type === 'routine') return 'Class: ' + (c ? classLabel(c) + ' ' + (c.subject || '') : '') + (e.room ? ' · ' + e.room : '');
+  return (e.type === 'exam' ? (EX[e.exam] ? EX[e.exam].name : 'Exam') : e.type === 'deadline' ? 'Marks submission' + (EX[e.exam] ? ': ' + EX[e.exam].name : '') : 'Note') + (c ? ' · ' + classLabel(c) : '') + (e.title ? ' — ' + e.title : '');
+}
+function viewEvents() {
+  setHeader('Dates & Routine', S.settings.sync ? 'Synced with Google Calendar' : 'Add the Google link in Settings to sync', '#/');
+  const app = $('#app');
+  const ev = S.events.filter(e => e.type !== 'routine').sort((a, b) => a.date < b.date ? -1 : 1);
+  const up = ev.filter(e => e.date >= today()), past = ev.filter(e => e.date < today()).reverse();
+  const rt = S.events.filter(e => e.type === 'routine').sort((a, b) => a.day - b.day || (a.start < b.start ? -1 : 1));
+  const row = e => '<div class="li" data-e="' + e.id + '"><span class="pill">' + (e.type === 'routine' ? WD[e.day].slice(0, 3) + ' ' + e.start : fmtDate(e.date)) + '</span><div class="grow small">' + esc(evTitle(e)) + '<div class="muted">' + EVT[e.type] + (e.time ? ' · ' + e.time : '') + '</div></div><span title="Calendar">' + (e.synced ? '✅' : (S.settings.sync ? '⏳' : '')) + '</span></div>';
+  app.innerHTML = '<div class="row" style="gap:8px;margin-bottom:12px"><button class="btn grow" data-new="exam">＋ Exam date</button><button class="btn sec grow" data-new="deadline">＋ Deadline</button><button class="btn sec grow" data-new="routine">＋ Routine</button></div>' +
+    '<h3 style="margin:6px 2px">Coming up</h3><div class="list">' + (up.map(row).join('') || '<div class="empty">Nothing yet</div>') + '</div>' +
+    '<h3 style="margin:6px 2px">Weekly class routine</h3><div class="list">' + (rt.map(row).join('') || '<div class="empty">No routine yet</div>') + '</div>' +
+    (past.length ? '<h3 style="margin:6px 2px">Past</h3><div class="list">' + past.slice(0, 20).map(row).join('') + '</div>' : '') +
+    (S.settings.sync ? '<button class="btn sec full" id="syncAll">🔄 Send everything to Google Calendar again</button>' : '');
+  $$('[data-new]', app).forEach(b => b.onclick = () => editEvent(null, b.dataset.new));
+  $$('.li[data-e]', app).forEach(el => el.onclick = () => editEvent(S.events.find(e => e.id === el.dataset.e)));
+  if ($('#syncAll')) $('#syncAll').onclick = async () => { let ok = 0; for (const e of S.events) { if (await calSync(e)) ok++; } save(); render(); toast(ok + ' / ' + S.events.length + ' sent'); };
+}
+function editEvent(e, type) {
+  const isNew = !e; e = e || {type, date: today(), time: '', end: '', classId: '', exam: '', title: '', day: 0, start: '08:00', endT: '08:45', room: ''};
+  const clsOpt = (sel, allowAll) => (allowAll ? '<option value="">All my classes</option>' : '') + S.classes.map(c => '<option value="' + c.id + '"' + (c.id === sel ? ' selected' : '') + '>' + esc(classLabel(c) + ' ' + (c.subject || '')) + '</option>').join('');
+  const exOpt = sel => '<option value="">—</option>' + EXAMS.map(x => '<option value="' + x.key + '"' + (x.key === sel ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('');
+  let body;
+  if (e.type === 'routine') body = '<label class="l">Class</label><select class="f" id="ec">' + clsOpt(e.classId) + '</select>' +
+    '<label class="l">Day</label><select class="f" id="ed">' + WD.map((d, i) => '<option value="' + i + '"' + (i === e.day ? ' selected' : '') + '>' + d + '</option>').join('') + '</select>' +
+    '<div class="grid2"><div><label class="l">Starts</label><input class="f" type="time" id="es" value="' + esc(e.start) + '"></div><div><label class="l">Ends</label><input class="f" type="time" id="ee" value="' + esc(e.endT) + '"></div></div>' +
+    '<label class="l">Room / note (optional)</label><input class="f" id="er" value="' + esc(e.room) + '">';
+  else body = '<label class="l">Exam</label><select class="f" id="ex">' + exOpt(e.exam) + '</select>' +
+    '<label class="l">Class</label><select class="f" id="ec">' + clsOpt(e.classId, true) + '</select>' +
+    '<div class="grid2"><div><label class="l">Date</label><input class="f" type="date" id="edt" value="' + esc(e.date) + '"></div><div><label class="l">Time (optional)</label><input class="f" type="time" id="etm" value="' + esc(e.time) + '"></div></div>' +
+    '<label class="l">Note (optional)</label><input class="f" id="ett" value="' + esc(e.title) + '" placeholder="e.g. Room 204, chapters 1–4">' +
+    (e.type === 'deadline' ? '<p class="muted small">Reminder the day before (Calendar' + (NATIVE ? ' + phone notification' : '') + ').</p>' : '');
+  sheet((isNew ? 'Add ' : 'Edit ') + EVT[e.type].replace(/^\S+ /, ''), body,
+    [isNew ? {label: 'Cancel', cls: 'sec'} : {label: '🗑 Delete', cls: 'red', fn: async () => { const id = e.id; withUndo('Deleted', () => { S.events = S.events.filter(x => x.id !== id); }); calDelete(id); nativeRemind(e, true); }},
+      {label: 'Save', fn: async el => {
+        if (e.type === 'routine') Object.assign(e, {classId: val(el, '#ec'), day: +val(el, '#ed'), start: val(el, '#es'), endT: val(el, '#ee'), room: val(el, '#er')});
+        else Object.assign(e, {exam: val(el, '#ex'), classId: val(el, '#ec'), date: val(el, '#edt'), time: val(el, '#etm'), title: val(el, '#ett')});
+        if (e.type !== 'routine' && !e.date) { toast('Pick a date'); return false; }
+        if (isNew) { e.id = 'e' + uid(); S.events.push(e); }
+        e.synced = false; save(); render();
+        nativeRemind(e);
+        if (S.settings.sync) { if (await calSync(e)) { save(); render(); toast('Saved & sent to Google Calendar'); } }
+        else toast('Saved');
+      }}]);
+}
+function evItem(e) {
+  const p2 = n => String(n).padStart(2, '0');
+  if (e.type === 'routine') {
+    const d = new Date(); d.setHours(0, 0, 0, 0); while (d.getDay() !== e.day) d.setDate(d.getDate() + 1);
+    const ds = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    return {title: evTitle(e), desc: 'BAFSB Tracker · weekly class', weekly: true, until: S.settings.year + '-12-31', start: ds + 'T' + (e.start || '08:00') + ':00', end: ds + 'T' + (e.endT || e.start || '08:45') + ':00', popups: [10], color: '9'};
+  }
+  const title = (e.type === 'deadline' ? '⏰ ' : '📝 ') + evTitle(e);
+  const popups = e.type === 'deadline' ? [1440, 2880] : [1440, 60];
+  if (!e.time) return {title, desc: 'BAFSB Tracker', allDay: true, date: e.date, popups: e.type === 'deadline' ? [960, 2400] : [960], color: e.type === 'deadline' ? '11' : '5'};
+  const [h, m] = e.time.split(':').map(Number); const endH = Math.min(23, h + (e.type === 'exam' ? 3 : 1));
+  return {title, desc: 'BAFSB Tracker', start: e.date + 'T' + e.time + ':00', end: e.date + 'T' + p2(endH) + ':' + p2(m) + ':00', popups, color: e.type === 'deadline' ? '11' : '5'};
+}
+async function gPost(body) {
+  const r = await fetch(S.settings.sync, {method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(body)});
+  const j = await r.json(); if (!j.ok) throw new Error(j.error || 'Google error'); return j;
+}
+async function calSync(e) {
+  if (!S.settings.sync) return false;
+  try { await gPost({action: 'upsert', id: e.id, item: evItem(e)}); e.synced = true; return true; }
+  catch (x) { toast('Calendar: ' + x.message); return false; }
+}
+async function calDelete(id) { if (!S.settings.sync) return; try { await gPost({action: 'delete', id}); } catch (x) {} }
+function nativeRemind(e, cancel) {
+  try {
+    if (!NATIVE || !('scheduleReminder' in AndroidApp)) return;
+    AndroidApp.cancelReminder(e.id);
+    if (cancel || e.type === 'routine' || !e.date) return;
+    const t = new Date(e.date + 'T20:00:00'); t.setDate(t.getDate() - 1);
+    if (t.getTime() > Date.now()) { AndroidApp.scheduleReminder(e.id, t.getTime(), (e.type === 'deadline' ? '⏰ Tomorrow: ' : '📝 Tomorrow: ') + evTitle(e), 'BAFSB Tracker'); try { AndroidApp.askNotify(); } catch (x) {} }
+  } catch (x) {}
+}
+
+/* =========================================================
+   BACKUP: Google Drive + Sheet (auto) · file (manual)
+   ========================================================= */
+const exportData = () => JSON.stringify(Object.assign({}, S, {app: 'bafsb', exportedAt: new Date().toISOString(),
+  examDefs: EXAMS.map(x => ({key: x.key, short: x.short, cols: colsOf(x).concat(outColsOf(x)).map(cc => ({k: cc.k, label: cc.label}))}))}));
+let cloudT = null;
+function scheduleCloud() {
+  if (!S.settings.sync) return;
+  clearTimeout(cloudT);
+  cloudT = setTimeout(() => cloudBackup(true), 5 * 60 * 1000);
+}
+async function cloudBackup(quiet) {
+  if (!S.settings.sync) { if (!quiet) toast('Add the Google link first'); return false; }
+  try {
+    const j = await gPost({action: 'backup', data: exportData()});
+    S.settings.lastBackup = Date.now(); if (j.sheet && /^https/.test(j.sheet)) S.settings.sheetUrl = j.sheet;
+    if (useLS) localStorage.setItem('bafsb-db', JSON.stringify(S)); else await IDB.set('db', S);
+    if (!quiet) toast('✅ Backed up to Google Drive + Sheet');
+    if (location.hash.startsWith('#/settings')) render();
+    return true;
+  } catch (e) { if (!quiet) toast('Backup failed: ' + e.message); return false; }
+}
+function restoreFrom(text) {
+  let d; try { d = JSON.parse(text); } catch (e) { toast('Not a valid backup file'); return; }
+  if (!d || !Array.isArray(d.students) || !Array.isArray(d.classes)) { toast('Not a BAFSB backup'); return; }
+  confirmBox('Restore this backup?', d.classes.length + ' classes, ' + d.students.length + ' students' + (d.exportedAt ? ', saved ' + new Date(d.exportedAt).toLocaleString('en-GB') : '') + '. Everything now on this phone will be replaced (UNDO available for a few seconds).', 'Restore', () => {
+    const keepSync = S.settings.sync;
+    withUndo('Backup restored', () => { delete d.examDefs; delete d.app; delete d.exportedAt; S = d; if (!S.settings.sync) S.settings.sync = keepSync; });
+  }, false);
+}
+function viewSettings() {
+  setHeader('Settings & Backup', 'App v' + APP_VER, '#/');
+  const st = S.settings, app = $('#app');
+  app.innerHTML =
+    '<div class="card"><h3>👤 Me</h3><label class="l">My name (Subject Teacher on marksheets)</label><input class="f" id="t1" value="' + esc(st.teacher) + '">' +
+    '<label class="l">Session year</label><input class="f" id="t2" inputmode="numeric" value="' + esc(st.year) + '"></div>' +
+    '<div class="card"><h3>📝 Full marks</h3><div class="grid2"><div><label class="l">Each Pop Test</label><input class="f" id="f1" inputmode="decimal" value="' + st.full.pop + '"></div><div><label class="l">Class Test</label><input class="f" id="f2" inputmode="decimal" value="' + st.full.ct + '"></div><div><label class="l">Half-yearly / Annual</label><input class="f" id="f3" inputmode="decimal" value="' + st.full.main + '"></div></div></div>' +
+    '<div class="card"><h3>🗒 Note types</h3><p class="muted small">Used when writing notes about a student.</p><div id="nts"></div><div class="row" style="margin-top:8px"><input class="f grow" id="ntn" placeholder="New note type"><button class="btn sm" id="ntA">Add</button></div></div>' +
+    '<div class="card"><h3>➕ Extra student fields</h3><p class="muted small">Your own fields shown for every student (e.g. Blood group, House, Bus route).</p><div id="cfs"></div><div class="row" style="margin-top:8px"><input class="f grow" id="cfn" placeholder="New field name"><button class="btn sm" id="cfA">Add</button></div></div>' +
+    '<div class="card"><h3>☁️ Google (Calendar + Drive + Sheet)</h3><p class="muted small">Your own Apps Script link (…/exec?k=secret). Data goes only to your Google account.</p>' +
+    '<input class="f" id="g1" placeholder="https://script.google.com/macros/s/…/exec?k=…" value="' + esc(st.sync) + '"><div class="row" style="gap:8px;margin-top:8px"><button class="btn sm sec" id="gT">Test link</button><button class="btn sm" id="gB">☁️ Back up now</button><button class="btn sm sec" id="gR">Restore from Drive</button></div>' +
+    '<p class="muted small" style="margin-top:8px">Last backup: ' + (st.lastBackup ? new Date(st.lastBackup).toLocaleString('en-GB') : 'never') + (st.sheetUrl ? ' · <a href="' + esc(st.sheetUrl) + '" target="_blank" rel="noopener">Open Google Sheet</a>' : '') + '<br>Automatic: 5 minutes after any change.</p></div>' +
+    '<div class="card"><h3>💾 Backup file (offline)</h3><div class="row" style="gap:8px"><button class="btn sm sec" id="b1">Download backup file</button><button class="btn sm sec" id="b2">Restore from file</button></div></div>' +
+    '<div class="card"><h3>⚠️ Danger zone</h3><button class="btn red sm" id="wipe">Delete all data on this phone</button></div>' +
+    '<p class="muted small" style="text-align:center">Data is stored only on this phone' + (st.sync ? ' and in your Google Drive' : '') + '. Nothing is sent anywhere else.</p>' +
+    '<div class="card" style="text-align:center"><img src="icon-192.png" alt="" style="width:56px;height:56px;border-radius:50%"><div style="font-weight:700;margin-top:6px">BAFSB</div><div class="muted small">Version ' + APP_VER + '<br>Developed by <b>' + esc(AUTHOR.name) + '</b><br>' + esc(AUTHOR.role) + '<br>' + esc(SCHOOL) + '</div></div>';
+  const bindSave = (id, fn) => { $(id).onchange = e => { fn(e.target.value.trim()); save(); toast('Saved'); }; };
+  bindSave('#t1', v => st.teacher = v); bindSave('#t2', v => st.year = v || st.year);
+  bindSave('#f1', v => st.full.pop = +v || 5); bindSave('#f2', v => st.full.ct = +v || 20); bindSave('#f3', v => st.full.main = +v || 100);
+  bindSave('#g1', v => { st.sync = v; S.events.forEach(e => e.synced = false); });
+  const drawList = (box, arr, onRename, onDel) => {
+    $(box).innerHTML = arr.map((n, i) => '<div class="row" style="margin:5px 0"><input class="f grow" data-i="' + i + '" value="' + esc(n) + '"><button class="btn sm red" data-x="' + i + '">✕</button></div>').join('') || '<div class="muted small">None</div>';
+    $$(box + ' input').forEach(inp => inp.onchange = () => { const nv = inp.value.trim(); if (nv) onRename(+inp.dataset.i, nv); });
+    $$(box + ' [data-x]').forEach(b => b.onclick = () => onDel(+b.dataset.x));
+  };
+  drawList('#nts', st.noteTypes, (i, nv) => { const old = st.noteTypes[i]; st.noteTypes[i] = nv; S.notes.forEach(n => { if (n.type === old) n.type = nv; }); save(); toast('Renamed'); },
+    i => withUndo('Note type removed (old notes keep it)', () => st.noteTypes.splice(i, 1)));
+  drawList('#cfs', st.customFields, (i, nv) => { const old = st.customFields[i]; st.customFields[i] = nv; S.students.forEach(s => { if (s.custom && old in s.custom) { s.custom[nv] = s.custom[old]; delete s.custom[old]; } }); save(); toast('Renamed'); },
+    i => withUndo('Field removed', () => { const n = st.customFields.splice(i, 1)[0]; S.students.forEach(s => { if (s.custom) delete s.custom[n]; }); }));
+  $('#ntA').onclick = () => { const v = $('#ntn').value.trim(); if (v && !st.noteTypes.includes(v)) { st.noteTypes.push(v); save(); render(); } };
+  $('#cfA').onclick = () => { const v = $('#cfn').value.trim(); if (v && !st.customFields.includes(v)) { st.customFields.push(v); save(); render(); } };
+  $('#gT').onclick = async () => { st.sync = $('#g1').value.trim(); save(true); try { const j = await gPost({action: 'ping'}); toast('✅ Connected to calendar: ' + j.calendar); } catch (e) { toast('⚠️ ' + e.message); } };
+  $('#gB').onclick = () => { st.sync = $('#g1').value.trim(); cloudBackup(false); };
+  $('#gR').onclick = async () => {
+    try {
+      const j = await gPost({action: 'listBackups'});
+      if (!j.files.length) { toast('No backups in Drive yet'); return; }
+      sheet('Restore from Drive', '<div class="list">' + j.files.map(f => '<div class="li" data-f="' + esc(f.id) + '"><div class="grow">' + esc(f.name) + '<div class="muted small">' + Math.round(f.size / 1024) + ' KB</div></div>›</div>').join('') + '</div>', [{label: 'Close', cls: 'sec'}],
+        (el, close) => $$('.li', el).forEach(li => li.onclick = async () => { close(); try { const b = await gPost({action: 'getBackup', fileId: li.dataset.f}); restoreFrom(b.data); } catch (e) { toast('⚠️ ' + e.message); } }));
+    } catch (e) { toast('⚠️ ' + e.message); }
+  };
+  $('#b1').onclick = () => {
+    const name = 'bafsb-backup-' + today() + '.json', data = exportData();
+    if (NATIVE) { const m = AndroidApp.saveFile(btoa(unescape(encodeURIComponent(data))), name, 'application/json'); if (m) toast(m); }
+    else { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], {type: 'application/json'})); a.download = name; a.click(); }
+    st.lastFile = Date.now(); if (!st.sync) st.lastBackup = Date.now(); save();
+  };
+  $('#b2').onclick = async () => { const f = await pickFile('.json,application/json'); if (f) restoreFrom(await f.text()); };
+  $('#wipe').onclick = () => confirmBox('Delete ALL data?', 'Every class, student, note and mark on this phone will be erased. Make a backup first. (UNDO works only for a few seconds.)', 'Delete everything', () => {
+    const keep = st.sync; withUndo('All data deleted', () => { S = blank(); S.settings.sync = keep; });
+  });
+}
+
+/* ---------- start ---------- */
+(async () => {
+  await load();
+  render();
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  // daily safety backup when online
+  if (S.settings.sync && Date.now() - (S.settings.lastBackup || 0) > 864e5) setTimeout(() => cloudBackup(true), 4000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden && S.settings.sync && S.settings.dirtyAt > (S.settings.lastBackup || 0)) cloudBackup(true); });
+})();
+</script>
+</body>
+</html>

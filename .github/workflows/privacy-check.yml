@@ -1,0 +1,21 @@
+name: Privacy check
+
+# Second safety net: if student data ever reaches GitHub, this check fails (red ✗) and tells you which file.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No student files or phone numbers in the repository
+        run: |
+          bad=0
+          found=$(git ls-files | grep -Ei '\.(csv|xlsx|xls|ods|pdf|keystore|jks)$|bafsb-backup-|BAFSB_start|Student_Lists' || true)
+          if [ -n "$found" ]; then echo "::error::Private files in repo:"; echo "$found"; bad=1; fi
+          hits=$(git ls-files | grep -v '^vendor/' | xargs grep -lE '(^|[^0-9])01[3-9][0-9]{8}([^0-9]|$)' 2>/dev/null || true)
+          if [ -n "$hits" ]; then echo "::error::Mobile numbers found in:"; echo "$hits"; bad=1; fi
+          exit $bad

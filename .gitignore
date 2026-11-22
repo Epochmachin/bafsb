@@ -1,0 +1,14 @@
+# Never commit student data or backups
+*.csv
+*.xlsx
+bafsb-backup-*.json
+*.keystore
+android/.gradle/
+android/app/build/
+android/build/
+*.pdf
+*.xls
+*.ods
+*.jks
+BAFSB_start*
+Student_Lists*/
