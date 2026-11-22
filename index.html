@@ -12,33 +12,33 @@
 <style>
 :root{--brand:#12355B;--brand2:#1d4f86;--accent:#C8102E;--bg:#F3F5F9;--card:#fff;--ink:#16202c;--muted:#64748b;--line:#e2e8f0;--ok:#15803d;--warn:#b45309;--bad:#C8102E;--r:14px}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
 body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 header.top{position:sticky;top:0;z-index:20;background:var(--brand);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-header.top h1{font-size:17px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
-header.top .sub{font-size:12px;opacity:.8;font-weight:400}
+header.top h1{font-size:19.5px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
+header.top .sub{font-size:13.5px;opacity:.8;font-weight:400}
 header.top img{width:34px;height:34px;border-radius:50%;background:#fff}
 .ib{background:none;border:0;color:inherit;width:38px;height:38px;border-radius:10px;font-size:20px;display:grid;place-items:center;cursor:pointer;text-decoration:none}
 .ib:active{background:rgba(255,255,255,.15)}
 main{max-width:760px;margin:0 auto;padding:12px}
 .card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(15,23,42,.06);border:1px solid var(--line)}
-.card h3{margin:0 0 8px;font-size:15px}
-.muted{color:var(--muted);font-size:13px}
+.card h3{margin:0 0 8px;font-size:17px}
+.muted{color:var(--muted);font-size:14.5px}
 .row{display:flex;align-items:center;gap:10px}
 .grow{flex:1;min-width:0}
 .wrap{flex-wrap:wrap}
-.btn{border:0;border-radius:11px;padding:10px 14px;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;justify-content:center}
+.btn{border:0;border-radius:12px;padding:12px 15px;font-size:16px;background:var(--brand);color:#fff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none;justify-content:center}
 .btn.sec{background:#e8eef7;color:var(--brand)}
 .btn.red{background:#fde8eb;color:var(--bad)}
 .btn.green{background:#e6f4ea;color:var(--ok)}
-.btn.sm{padding:7px 10px;font-size:13px;border-radius:9px}
+.btn.sm{padding:9px 12px;font-size:14.5px;border-radius:9px}
 .btn.full{width:100%}
 .btn:disabled{opacity:.5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cls{display:flex;gap:12px;align-items:center;cursor:pointer}
-.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;vertical-align:middle}
+.badge{display:inline-block;font-size:12.5px;padding:2px 7px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;vertical-align:middle}
 .badge.ct{background:#fff4d6;color:#8a5a00}
 .badge.red{background:#fde8eb;color:var(--bad)}
 .badge.grey{background:#eef0f3;color:#556}
@@ -48,40 +48,40 @@ main{max-width:760px;margin:0 auto;padding:12px}
 .li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
 .li:last-child{border-bottom:0}
 .li:active{background:#f6f8fb}
-.roll{width:36px;height:36px;border-radius:50%;background:#e8eef7;color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
-.name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.call{width:40px;height:40px;border-radius:50%;background:#e6f4ea;color:var(--ok);display:grid;place-items:center;text-decoration:none;font-size:18px;flex:none}
+.roll{width:42px;height:42px;border-radius:50%;background:#e8eef7;color:var(--brand);display:grid;place-items:center;font-weight:700;font-size:15px;flex:none}
+.name{font-weight:650;font-size:17.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.call{width:46px;height:46px;border-radius:50%;background:#e6f4ea;color:var(--ok);display:grid;place-items:center;text-decoration:none;font-size:18px;flex:none}
 .tabs{display:flex;gap:6px;margin:0 0 12px;overflow-x:auto}
-.tab{padding:8px 14px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;border:0;white-space:nowrap;cursor:pointer}
+.tab{padding:10px 16px;font-size:16px;border-radius:20px;background:#e8eef7;color:var(--brand);font-weight:600;border:0;white-space:nowrap;cursor:pointer}
 .tab.on{background:var(--brand);color:#fff}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.chip{padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:13px;cursor:pointer}
+.chip{padding:7px 13px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:15px;cursor:pointer}
 .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
-input.f,select.f,textarea.f{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 11px;background:#fff;outline:none}
+input.f,select.f,textarea.f{width:100%;border:1px solid #cbd5e1;border-radius:11px;padding:12px 12px;font-size:16.5px;background:#fff;outline:none}
 input.f:focus,select.f:focus,textarea.f:focus{border-color:var(--brand2);box-shadow:0 0 0 3px rgba(29,79,134,.15)}
-label.l{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px;font-weight:600}
+label.l{display:block;font-size:14.5px;color:var(--muted);margin:10px 0 4px;font-weight:600}
 .search{position:relative;margin-bottom:10px}
 .search input{padding-left:36px}
 .search span{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
 .fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:18px;background:var(--accent);color:#fff;border:0;font-size:30px;box-shadow:0 6px 16px rgba(200,16,46,.35);z-index:15;cursor:pointer}
 .sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
 .sheet{background:#fff;width:100%;max-width:760px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));animation:up .2s ease-out}
-.sheet h2{margin:0 0 6px;font-size:18px}
+.sheet h2{margin:0 0 6px;font-size:20px}
 .sheet .acts{display:flex;gap:8px;margin-top:16px;position:sticky;bottom:-18px;background:#fff;padding:10px 0 4px}
 .sheet .acts .btn{flex:1}
 @keyframes up{from{transform:translateY(40px);opacity:0}}@keyframes fade{from{opacity:0}}
-#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 14px;border-radius:12px;z-index:60;display:none;align-items:center;gap:12px;max-width:92vw;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 16px;border-radius:12px;z-index:60;display:none;align-items:center;gap:12px;max-width:92vw;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 #toast button{background:none;border:0;color:#93c5fd;font-weight:700;cursor:pointer}
-table.mk{border-collapse:separate;border-spacing:0;width:100%;font-size:13.5px}
-table.mk th{position:sticky;top:0;background:#e8eef7;color:var(--brand);font-size:11.5px;padding:7px 4px;text-align:center;z-index:2}
+table.mk{border-collapse:separate;border-spacing:0;width:100%;font-size:15px}
+table.mk th{position:sticky;top:0;background:#e8eef7;color:var(--brand);font-size:13px;padding:7px 4px;text-align:center;z-index:2}
 table.mk td{border-bottom:1px solid var(--line);padding:4px 2px;text-align:center;background:#fff}
-table.mk td.nm{text-align:left;max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
-table.mk input{width:100%;min-width:34px;max-width:52px;border:1px solid #cbd5e1;border-radius:7px;padding:7px 2px;text-align:center;background:#fff}
+table.mk td.nm{text-align:left;max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+table.mk input{width:100%;min-width:34px;max-width:52px;border:1px solid #cbd5e1;border-radius:8px;padding:9px 2px;text-align:center;background:#fff;font-size:16.5px}
 table.mk input.bad{border-color:var(--bad);background:#fde8eb}
 table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
 .mkwrap{overflow:auto;max-height:calc(100vh - 210px);border-radius:var(--r);border:1px solid var(--line);background:#fff}
-.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;font-size:14px}
-.kv div:nth-child(odd){color:var(--muted);font-size:13px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:7px 10px;font-size:16px}
+.kv div:nth-child(odd){color:var(--muted);font-size:14.5px}
 .note{border-left:3px solid var(--brand2);padding:6px 10px;margin:8px 0;background:#f8fafc;border-radius:0 10px 10px 0}
 .note.Behaviour{border-color:#7c3aed}.note.Weakness{border-color:var(--bad)}.note.Study{border-color:var(--ok)}
 .stars{color:#f59e0b;letter-spacing:1px}
@@ -93,12 +93,12 @@ table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
 .bar i.low{background:var(--bad)}
 .bar b{color:var(--ink);font-size:11.5px}
 .empty{text-align:center;color:var(--muted);padding:30px 10px}
-.warnbox{background:#fff7e6;border:1px solid #fcd9a0;color:#7a4b00;border-radius:12px;padding:10px 12px;font-size:13.5px;margin-bottom:12px}
+.warnbox{background:#fff7e6;border:1px solid #fcd9a0;color:#7a4b00;border-radius:12px;padding:11px 13px;font-size:15px;margin-bottom:12px}
 .ocrrow{display:grid;grid-template-columns:26px 54px 1fr 118px 30px;gap:6px;align-items:center;margin-bottom:6px}
 .ocrrow input.f{padding:7px 6px;font-size:13.5px}
-.pill{font-size:12px;padding:3px 8px;border-radius:8px;background:#eef2f7}
+.pill{font-size:14px;padding:3px 8px;border-radius:8px;background:#eef2f7}
 .hr{height:1px;background:var(--line);margin:12px 0}
-.small{font-size:12.5px}
+.small{font-size:14.5px}
 .right{margin-left:auto}
 @media (min-width:700px){.ocrrow{grid-template-columns:26px 70px 1fr 160px 30px}}
 </style>
@@ -115,7 +115,7 @@ table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
    Data lives only on this phone (IndexedDB). Optional backup to the teacher's own
    Google Drive + Google Sheet and Calendar sync through an Apps Script link.
    ========================================================= */
-const APP_VER = '1.0.0';
+const APP_VER = '1.1.0';
 const NATIVE = (() => { try { return !!(window.AndroidApp && AndroidApp.isApp()); } catch (e) { return false; } })();
 const SCHOOL = 'Bangladesh Air Force Shaheen College Bogura';
 /* author credit (encoded) */
@@ -575,8 +575,9 @@ function editNote(n, s) {
 /* ---------- MARKS ENTRY ---------- */
 let moveDir = 'row';
 function viewMarks(c, ex) {
-  setHeader(ex.name, classLabel(c) + ' · ' + (c.subject || ''), '#/class/' + c.id + '/marks', '<button class="ib" id="pdfB" aria-label="PDF">🖨️</button>');
+  setHeader(ex.name, classLabel(c) + ' · ' + (c.subject || ''), '#/class/' + c.id + '/marks', '<button class="ib" id="scanB" aria-label="Scan marks">📷</button><button class="ib" id="pdfB" aria-label="PDF">🖨️</button>');
   $('#pdfB').onclick = () => pdfDialog(c, ex);
+  $('#scanB').onclick = () => scanMarks(c, ex);
   const list = studentsOf(c.id), M = marksOf(c.id, ex.key), cols = colsOf(ex), outs = outColsOf(ex);
   const full = fullOf(ex), cellMax = ex.kind === 'pop' ? full : full;
   const app = $('#app');
@@ -587,11 +588,12 @@ function viewMarks(c, ex) {
     list.map((s, r) => { const m = M[s.id] || {}; return '<tr data-s="' + s.id + '"><td><b>' + esc(s.roll) + '</b></td><td class="nm">' + esc(s.name) + '</td>' +
       cols.map((x, ci) => '<td><input data-r="' + r + '" data-c="' + ci + '" data-k="' + x.k + '" ' + (x.num ? 'inputmode="decimal"' : '') + ' value="' + esc(m[x.k] == null ? '' : m[x.k]) + '" autocomplete="off"></td>').join('') +
       outs.map(x => '<td class="tot" data-o="' + x.k + '">' + esc(m[x.k] == null ? '' : m[x.k]) + '</td>').join('') + '</tr>'; }).join('') +
-    '</tbody></table></div><div class="row" style="margin-top:12px"><span class="muted small grow" id="cnt"></span><button class="btn" id="pdf2">🖨️ Make PDF</button></div>';
+    '</tbody></table></div><div class="row" style="margin-top:12px;gap:8px"><span class="muted small grow" id="cnt"></span><button class="btn sec" id="scan2">📷 Scan</button><button class="btn" id="pdf2">🖨️ PDF</button></div>';
   const count = () => { $('#cnt').textContent = list.filter(s => M[s.id] && M[s.id].total != null).length + ' / ' + list.length + ' entered · saved automatically'; };
   count();
   $$('.chip', app).forEach(ch => ch.onclick = () => { moveDir = ch.dataset.d; $$('.chip', app).forEach(x => x.classList.toggle('on', x === ch)); });
   $('#pdf2').onclick = () => pdfDialog(c, ex);
+  $('#scan2').onclick = () => scanMarks(c, ex);
   const check = inp => {
     const k = inp.dataset.k, v = inp.value.trim();
     let bad = false;
@@ -621,6 +623,126 @@ function viewMarks(c, ex) {
     });
     inp.addEventListener('focus', () => inp.select());
   });
+}
+
+/* =========================================================
+   SCAN handwritten marks with Claude (camera · gallery photo · image/PDF file)
+   The teacher writes marks by hand on the printed marksheet, then takes a photo or
+   uploads a file. Claude reads the marks; they are filled into the grid for checking.
+   The API key stays on this phone only (never in backups).
+   ========================================================= */
+const AI_MODEL = 'claude-opus-5-5';
+const AI_SDK = 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.6.0/+esm';
+const aiKey = () => { try { return localStorage.getItem('bafsb-ai-key') || ''; } catch (e) { return ''; } };
+const blobToB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(b); });
+async function aiClient() {
+  const mod = await import(AI_SDK);
+  const Anthropic = mod.default || mod.Anthropic;
+  return new Anthropic({apiKey: aiKey(), dangerouslyAllowBrowser: true, maxRetries: 2});
+}
+async function fileToPart(file) {
+  if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) return {type: 'document', source: {type: 'base64', media_type: 'application/pdf', data: await blobToB64(file)}};
+  const img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('Could not open ' + file.name)); im.src = URL.createObjectURL(file); });
+  const sc = Math.min(1, 2200 / Math.max(img.width, img.height));
+  const cv = document.createElement('canvas'); cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+  cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(img.src);
+  return {type: 'image', source: {type: 'base64', media_type: 'image/jpeg', data: cv.toDataURL('image/jpeg', 0.88).split(',')[1]}};
+}
+function aiErr(e) {
+  const s = e && e.status;
+  if (s === 401) return 'The API key is wrong or expired. Check it in Settings.';
+  if (s === 402 || /credit|billing/i.test(e && e.message || '')) return 'No API credit left. Add credit in the Claude Console.';
+  if (s === 429) return 'Too many requests right now. Wait a minute and try again.';
+  if (s === 413) return 'The files are too large. Use fewer or smaller photos.';
+  if (!navigator.onLine) return 'No internet connection.';
+  return (e && e.message ? e.message : String(e)).slice(0, 200);
+}
+function scanMarks(c, ex) {
+  if (!aiKey()) {
+    sheet('Scan marks needs a key', '<p class="muted">To read handwritten marks from a photo or file, add your Claude API key once in ⚙️ Settings → “Scan marks with AI”.</p>',
+      [{label: 'Close', cls: 'sec'}, {label: 'Open Settings', fn: () => go('#/settings')}]);
+    return;
+  }
+  const files = [];
+  const draw = el => {
+    $('#fl', el).innerHTML = files.length ? files.map((f, i) => '<div class="row small" style="margin:4px 0"><span class="grow">' + (f.type === 'application/pdf' ? '📄 ' : '🖼 ') + esc(f.name || 'photo') + ' · ' + Math.round(f.size / 1024) + ' KB</span><button class="btn sm red" data-x="' + i + '">✕</button></div>').join('') : '<div class="muted small">No pages added yet.</div>';
+    $$('[data-x]', el).forEach(b => b.onclick = () => { files.splice(+b.dataset.x, 1); draw(el); });
+    $('.acts .btn:last-child', el).disabled = !files.length;
+  };
+  const add = async (el, accept, capture) => {
+    const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !capture; if (capture) i.capture = 'environment';
+    i.onchange = () => { [...i.files].forEach(f => files.push(f)); draw(el); }; i.click();
+  };
+  sheet('Scan marks · ' + ex.name, '<p class="muted small">Write marks by hand on the printed marksheet, then add a photo or file of each page. Claude reads the marks and fills them in for you to check. The pages are sent to Anthropic (Claude) only for reading.</p>' +
+    '<div style="display:grid;gap:8px"><button class="btn sec full" id="s1">📷 Take photo (camera)</button><button class="btn sec full" id="s2">🖼 Choose photo from gallery</button><button class="btn sec full" id="s3">📄 Upload file (image or PDF)</button></div>' +
+    '<div class="hr"></div><div id="fl"></div>',
+    [{label: 'Cancel', cls: 'sec'}, {label: '🤖 Read marks', fn: () => { runScan(c, ex, files.slice()); }}], el => {
+      $('#s1', el).onclick = () => add(el, 'image/*', true);
+      $('#s2', el).onclick = () => add(el, 'image/*');
+      $('#s3', el).onclick = () => add(el, 'image/*,application/pdf,.pdf');
+      draw(el);
+    });
+}
+async function runScan(c, ex, files) {
+  if (!files.length) return;
+  const list = studentsOf(c.id), cols = colsOf(ex);
+  const box = sheet('Reading marks…', '<p class="muted">Claude is reading ' + files.length + ' page(s). This usually takes 20–60 seconds. Keep the app open.</p><div class="pill" id="prog">Preparing pages…</div>');
+  const setP = t => { const p = $('#prog', box.el); if (p) p.textContent = t; };
+  try {
+    const parts = [];
+    for (const f of files) parts.push(await fileToPart(f));
+    setP('Sending to Claude…');
+    const keys = cols.map(x => x.k).concat(['total']);
+    const props = {roll: {type: 'string', description: 'Roll number exactly as on the sheet'}};
+    keys.forEach(k => { props[k] = {type: 'string'}; });
+    props.unsure = {type: 'boolean', description: 'true if any value in this row was hard to read'};
+    const schema = {type: 'object', additionalProperties: false, required: ['rows'], properties: {rows: {type: 'array', items: {type: 'object', additionalProperties: false, required: ['roll'].concat(keys, ['unsure']), properties: props}}}};
+    const colText = cols.map(x => '"' + x.k + '" = column "' + x.label + '"' + (x.num ? ' (number, max ' + fullOf(ex) + ')' : '')).join('; ') + '; "total" = the Total' + (ex.kind === 'pop' ? ' Mark' : '') + ' column if something is written there';
+    const text = 'These pages are a school marksheet for ' + classLabel(c) + ' (' + (c.subject || '') + '), exam: ' + ex.name + '. ' +
+      'Names and rolls are printed; the marks are handwritten.\n\nColumns to read: ' + colText + '.\n\n' +
+      'Students of this class (Roll | Name):\n' + list.map(s => s.roll + ' | ' + s.name).join('\n') + '\n\n' +
+      'Return one row for every student whose row has at least one handwritten mark. Copy each value exactly as written (digits, decimals like 7.5). ' +
+      'Use "-" when the cell says Ab / A / absent. Use "" for an empty cell. Never invent a value: if a mark cannot be read, write your best reading and set unsure to true. ' +
+      'Match rows by the printed Roll; if the roll is unclear use the printed name.';
+    const client = await aiClient();
+    const res = await client.beta.messages.create({
+      model: AI_MODEL, max_tokens: 16000,
+      betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default',
+      output_config: {effort: 'high', format: {type: 'json_schema', schema}},
+      system: 'You read handwritten marks from photos and scans of printed school marksheets and return them as data. Be exact; accuracy matters more than speed.',
+      messages: [{role: 'user', content: parts.concat([{type: 'text', text}])}],
+    });
+    box.close();
+    if (res.stop_reason === 'refusal') { toast('Claude could not read these pages. Try clearer photos.'); return; }
+    const tb = (res.content || []).find(b => b.type === 'text');
+    let data; try { data = JSON.parse(tb ? tb.text : ''); } catch (e) { toast('The reply could not be read' + (res.stop_reason === 'max_tokens' ? ' (too long — scan fewer pages at once)' : '') + '. Try again.'); return; }
+    applyScan(c, ex, data.rows || []);
+  } catch (e) { box.close(); toast('⚠️ ' + aiErr(e)); }
+}
+function applyScan(c, ex, rows) {
+  const list = studentsOf(c.id), cols = colsOf(ex), M = marksOf(c.id, ex.key), full = fullOf(ex);
+  const snap = JSON.stringify(S);
+  let filled = 0; const notFound = [], unsure = [], mismatch = [], over = [];
+  rows.forEach(r => {
+    const s = list.find(x => String(x.roll).trim() === String(r.roll).trim());
+    if (!s) { if (r.roll) notFound.push(r.roll); return; }
+    const m = M[s.id] || (M[s.id] = {}); let any = false;
+    cols.forEach(x => { const v = String(r[x.k] == null ? '' : r[x.k]).trim(); if (v !== '') { m[x.k] = v; any = true; if (x.num && v !== '-' && (isNaN(Number(v)) || Number(v) > full)) over.push(s.roll); } });
+    if (!any) { if (!Object.keys(m).length) delete M[s.id]; return; }
+    calc(ex, m); m._ai = 1; filled++;
+    if (r.unsure) unsure.push(s.roll);
+    const wt = num(r.total);
+    if (wt != null && m.total != null && Math.abs(wt - m.total) > 0.01) mismatch.push(s.roll + ' (written ' + wt + ', sum ' + m.total + ')');
+  });
+  save(); render();
+  $$('table.mk tr[data-s]').forEach(tr => { const m = M[tr.dataset.s]; if (m && m._ai) { tr.style.background = '#fffbe6'; $$('td', tr).forEach(td => td.style.background = unsure.includes((stu(tr.dataset.s) || {}).roll) ? '#ffedd5' : '#fffbe6'); } });
+  Object.values(M).forEach(m => delete m._ai); save(true);
+  const msg = '<p><b>' + filled + '</b> students filled. Filled rows are highlighted — please check them against the paper.</p>' +
+    (unsure.length ? '<div class="warnbox">🟠 Hard to read, check carefully: Roll ' + esc(unsure.join(', ')) + '</div>' : '') +
+    (mismatch.length ? '<div class="warnbox">➕ Written total differs from CQ+MCQ: ' + esc(mismatch.join('; ')) + '</div>' : '') +
+    (over.length ? '<div class="warnbox">🔴 Above full marks / not a number: Roll ' + esc([...new Set(over)].join(', ')) + '</div>' : '') +
+    (notFound.length ? '<div class="warnbox">❓ Rolls on paper not in this class: ' + esc(notFound.join(', ')) + '</div>' : '');
+  sheet('Scan done', msg, [{label: 'Undo scan', cls: 'red', fn: () => { S = JSON.parse(snap); save(); render(); toast('Scan undone'); }}, {label: 'OK, I will check'}]);
 }
 
 /* =========================================================
@@ -1021,6 +1143,10 @@ function viewSettings() {
     '<div class="card"><h3>📝 Full marks</h3><div class="grid2"><div><label class="l">Each Pop Test</label><input class="f" id="f1" inputmode="decimal" value="' + st.full.pop + '"></div><div><label class="l">Class Test</label><input class="f" id="f2" inputmode="decimal" value="' + st.full.ct + '"></div><div><label class="l">Half-yearly / Annual</label><input class="f" id="f3" inputmode="decimal" value="' + st.full.main + '"></div></div></div>' +
     '<div class="card"><h3>🗒 Note types</h3><p class="muted small">Used when writing notes about a student.</p><div id="nts"></div><div class="row" style="margin-top:8px"><input class="f grow" id="ntn" placeholder="New note type"><button class="btn sm" id="ntA">Add</button></div></div>' +
     '<div class="card"><h3>➕ Extra student fields</h3><p class="muted small">Your own fields shown for every student (e.g. Blood group, House, Bus route).</p><div id="cfs"></div><div class="row" style="margin-top:8px"><input class="f grow" id="cfn" placeholder="New field name"><button class="btn sm" id="cfA">Add</button></div></div>' +
+    '<div class="card"><h3>🔠 Text size</h3><div class="chips">' + [['1', 'Normal'], ['1.1', 'Large'], ['1.2', 'Extra large']].map(([z, n]) => '<span class="chip ' + (String(st.textSize || 1) === z ? 'on' : '') + '" data-z="' + z + '">' + n + '</span>').join('') + '</div></div>' +
+    '<div class="card"><h3>🤖 Scan marks with AI (Claude)</h3><p class="muted small">Lets the app read handwritten marks from a photo or PDF of the marksheet. Needs a Claude API key from console.anthropic.com (paid; roughly 10 taka per page, check usage in the Console). The key stays only on this phone — it is not put in backups.</p>' +
+    '<input class="f" id="ak" type="password" autocomplete="off" placeholder="' + (aiKey() ? 'Key saved ✓ (paste a new one to replace)' : 'sk-ant-…') + '">' +
+    '<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" id="akS">Save key</button><button class="btn sm sec" id="akT"' + (aiKey() ? '' : ' disabled') + '>Test</button><button class="btn sm red" id="akR"' + (aiKey() ? '' : ' disabled') + '>Remove</button></div></div>' +
     '<div class="card"><h3>☁️ Google (Calendar + Drive + Sheet)</h3><p class="muted small">Your own Apps Script link (…/exec?k=secret). Data goes only to your Google account.</p>' +
     '<input class="f" id="g1" placeholder="https://script.google.com/macros/s/…/exec?k=…" value="' + esc(st.sync) + '"><div class="row" style="gap:8px;margin-top:8px"><button class="btn sm sec" id="gT">Test link</button><button class="btn sm" id="gB">☁️ Back up now</button><button class="btn sm sec" id="gR">Restore from Drive</button></div>' +
     '<p class="muted small" style="margin-top:8px">Last backup: ' + (st.lastBackup ? new Date(st.lastBackup).toLocaleString('en-GB') : 'never') + (st.sheetUrl ? ' · <a href="' + esc(st.sheetUrl) + '" target="_blank" rel="noopener">Open Google Sheet</a>' : '') + '<br>Automatic: 5 minutes after any change.</p></div>' +
@@ -1041,7 +1167,11 @@ function viewSettings() {
     i => withUndo('Note type removed (old notes keep it)', () => st.noteTypes.splice(i, 1)));
   drawList('#cfs', st.customFields, (i, nv) => { const old = st.customFields[i]; st.customFields[i] = nv; S.students.forEach(s => { if (s.custom && old in s.custom) { s.custom[nv] = s.custom[old]; delete s.custom[old]; } }); save(); toast('Renamed'); },
     i => withUndo('Field removed', () => { const n = st.customFields.splice(i, 1)[0]; S.students.forEach(s => { if (s.custom) delete s.custom[n]; }); }));
-  $('#ntA').onclick = () => { const v = $('#ntn').value.trim(); if (v && !st.noteTypes.includes(v)) { st.noteTypes.push(v); save(); render(); } };
+  $$('[data-z]', app).forEach(ch => ch.onclick = () => { st.textSize = +ch.dataset.z; applyTextSize(); save(); render(); });
+  $('#akS').onclick = () => { const v = $('#ak').value.trim(); if (!/^sk-ant-/.test(v)) { toast('That does not look like a Claude API key (starts with sk-ant-)'); return; } try { localStorage.setItem('bafsb-ai-key', v); } catch (e) {} render(); toast('Key saved on this phone'); };
+  $('#akR').onclick = () => { try { localStorage.removeItem('bafsb-ai-key'); } catch (e) {} render(); toast('Key removed'); };
+  $('#akT').onclick = async () => { toast('Testing…'); try { const cl = await aiClient(); const m = await cl.models.retrieve(AI_MODEL); toast('✅ Key works · ' + (m.display_name || AI_MODEL)); } catch (e) { toast('⚠️ ' + aiErr(e)); } };
+  $('#ntA').onclick =() => { const v = $('#ntn').value.trim(); if (v && !st.noteTypes.includes(v)) { st.noteTypes.push(v); save(); render(); } };
   $('#cfA').onclick = () => { const v = $('#cfn').value.trim(); if (v && !st.customFields.includes(v)) { st.customFields.push(v); save(); render(); } };
   $('#gT').onclick = async () => { st.sync = $('#g1').value.trim(); save(true); try { const j = await gPost({action: 'ping'}); toast('✅ Connected to calendar: ' + j.calendar); } catch (e) { toast('⚠️ ' + e.message); } };
   $('#gB').onclick = () => { st.sync = $('#g1').value.trim(); cloudBackup(false); };
@@ -1066,8 +1196,10 @@ function viewSettings() {
 }
 
 /* ---------- start ---------- */
+function applyTextSize() { const z = Number(S.settings.textSize) || 1; document.body.style.zoom = z === 1 ? '' : String(z); }
 (async () => {
   await load();
+  applyTextSize();
   render();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('service-worker.js').catch(() => {});
   // daily safety backup when online

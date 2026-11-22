@@ -44,6 +44,7 @@ public class MainActivity extends Activity {
 
     WebView web;
     ValueCallback<Uri[]> fileCallback;
+    Uri cameraUri;
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -94,13 +95,35 @@ public class MainActivity extends Activity {
             public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams params) {
                 if (fileCallback != null) fileCallback.onReceiveValue(null);
                 fileCallback = cb;
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*");
+                cameraUri = null;
                 try {
-                    startActivityForResult(Intent.createChooser(i, "ফাইল বাছুন"), FILE_REQ);
-                } catch (ActivityNotFoundException e) {
+                    // "Take photo" button (capture) → open the camera directly
+                    if (params.isCaptureEnabled()) {
+                        File dir = new File(getCacheDir(), "share"); dir.mkdirs();
+                        File f = new File(dir, "scan-" + System.currentTimeMillis() + ".jpg");
+                        cameraUri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", f);
+                        Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        cam.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
+                        cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivityForResult(cam, FILE_REQ);
+                        return true;
+                    }
+                    // Gallery photo / file (image, PDF, Excel, backup) — several at once when allowed
+                    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    i.setType("*/*");
+                    String[] types = params.getAcceptTypes();
+                    ArrayList<String> mimes = new ArrayList<>();
+                    if (types != null) for (String t : types) if (t != null && t.contains("/")) mimes.add(t.trim());
+                    if (!mimes.isEmpty() && !mimes.contains("*/*")) {
+                        if (mimes.size() == 1) i.setType(mimes.get(0));
+                        else i.putExtra(Intent.EXTRA_MIME_TYPES, mimes.toArray(new String[0]));
+                    }
+                    if (params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE) i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(Intent.createChooser(i, "Choose file"), FILE_REQ);
+                } catch (Exception e) {
                     fileCallback = null;
+                    cameraUri = null;
                     return false;
                 }
                 return true;
@@ -140,8 +163,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
         if (req == FILE_REQ && fileCallback != null) {
-            fileCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(res, data));
+            Uri[] out = null;
+            if (res == RESULT_OK) {
+                if (cameraUri != null) out = new Uri[]{cameraUri};
+                else if (data != null && data.getClipData() != null) {
+                    ClipData cd = data.getClipData();
+                    out = new Uri[cd.getItemCount()];
+                    for (int k = 0; k < cd.getItemCount(); k++) out[k] = cd.getItemAt(k).getUri();
+                } else if (data != null && data.getData() != null) out = new Uri[]{data.getData()};
+            }
+            fileCallback.onReceiveValue(out);
             fileCallback = null;
+            cameraUri = null;
             return;
         }
         super.onActivityResult(req, res, data);
