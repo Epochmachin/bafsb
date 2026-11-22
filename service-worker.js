@@ -1,5 +1,5 @@
 // BAFSB: offline cache. Bump the number in CACHE every time you publish a new version.
-const CACHE = 'bafsb-v1-2-0';
+const CACHE = 'bafsb-v1-3-0';
 const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-maskable-192.png', './icon-maskable-512.png', './apple-touch-icon.png', './logo.png', './vendor/jspdf.umd.min.js', './vendor/xlsx.full.min.js'];
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE))); self.skipWaiting(); });

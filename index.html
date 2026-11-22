@@ -115,7 +115,7 @@ table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
    Data lives only on this phone (IndexedDB). Optional backup to the teacher's own
    Google Drive + Google Sheet and Calendar sync through an Apps Script link.
    ========================================================= */
-const APP_VER = '1.2.0';
+const APP_VER = '1.3.0';
 const NATIVE = (() => { try { return !!(window.AndroidApp && AndroidApp.isApp()); } catch (e) { return false; } })();
 const SCHOOL = 'Bangladesh Air Force Shaheen College Bogura';
 /* author credit (encoded) */
@@ -351,46 +351,65 @@ function editClass(c) {
 
 /* ---------- NEW SESSION: promote classes to the next year ----------
    Old year stays untouched (classes, students, marks, notes → still viewable & printable).
-   Each carried student gets a new record in the new class linked by prevId, so their history follows them. */
+   At BAFSB every class is re-ranked each year and the whole class is dealt round-robin into sections
+   (roll 1 → 1st section, 2 → 2nd, 3 → 3rd, 4 → 1st …), so a student's section AND roll change.
+   Class 6–9 have 3 sections, Class 10 has 2 (Electron, Proton).
+   So we do NOT copy a section into a section. We create the new year's empty sections; importing each
+   section's official list then finds every student by Student Code in last year's class (any section),
+   links them by prevId (history follows) and sets the new roll. */
+function gradeOf(n) { const m = /(\d+)/.exec(n || ''); return m ? Number(m[1]) : null; }
 function nextClassName(n) { const m = /^Class\s*(\d+)$/i.exec(n || ''); return m ? 'Class ' + (Number(m[1]) + 1) : n; }
+const DEFAULT_SECTIONS = {10: 'Electron, Proton'};
+// last year's students who can come into class c (every section of the previous class)
+function prevPool(c) {
+  const py = String(Number(c.year) - 1), g = gradeOf(c.name);
+  let ids = (c.prevClassIds || []).filter(id => cls(id));
+  if (!ids.length) ids = S.classes.filter(x => String(x.year) === py && g != null && gradeOf(x.name) === g - 1).map(x => x.id);
+  const set = new Set(ids);
+  return S.students.filter(s => set.has(s.classId)).sort((a, b) => (a.archived ? 1 : 0) - (b.archived ? 1 : 0));
+}
 function promoteSession() {
   const from = String(S.settings.year), to = String(Number(from) + 1);
-  const src = S.classes.filter(c => String(c.year) === from).sort((a, b) => (parseInt(/\d+/.exec(a.name) || 0) - parseInt(/\d+/.exec(b.name) || 0)));
+  const src = S.classes.filter(c => String(c.year) === from).sort((a, b) => (gradeOf(a.name) || 0) - (gradeOf(b.name) || 0));
   if (!src.length) { toast('No classes in ' + from); return; }
-  const plan = src.map(c => ({c, to: nextClassName(c.name), section: c.section, carry: !/Class\s*10$/i.test(c.name), keep: new Set(studentsOf(c.id).map(s => s.id))}));
+  // one row per class (all its sections together)
+  const groups = [];
+  src.forEach(c => { let g = groups.find(x => x.name === c.name); if (!g) groups.push(g = {name: c.name, classes: []}); g.classes.push(c); });
+  const plan = groups.map(g => {
+    const nx = nextClassName(g.name);
+    return {g, to: nx, carry: !/Class\s*10$/i.test(g.name), subject: g.classes[0].subject,
+      sections: DEFAULT_SECTIONS[gradeOf(nx)] || g.classes.map(c => c.section).filter(Boolean).join(', ')};
+  });
   const draw = el => {
     $('#pp', el).innerHTML = plan.map((p, i) => {
-      const list = studentsOf(p.c.id);
-      return '<div class="card" style="padding:10px"><label class="row"><input type="checkbox" data-carry="' + i + '" ' + (p.carry ? 'checked' : '') + '><b class="grow">' + esc(classLabel(p.c)) + ' (' + list.length + ')</b></label>' +
-        (p.carry ? '<div class="grid2" style="margin-top:6px"><div><label class="l">New class</label><input class="f" data-to="' + i + '" value="' + esc(p.to) + '"></div><div><label class="l">New section</label><input class="f" data-sec="' + i + '" value="' + esc(p.section) + '"></div></div>' +
-          '<details style="margin-top:8px"><summary class="small"><b>' + p.keep.size + '</b> of ' + list.length + ' moving up — untick who left / failed</summary>' +
-          list.map(s => '<label class="row small" style="margin:4px 0"><input type="checkbox" data-k="' + i + '" value="' + s.id + '" ' + (p.keep.has(s.id) ? 'checked' : '') + '><span class="roll" style="width:28px;height:28px;font-size:11px">' + esc(s.roll) + '</span><span class="grow">' + esc(s.name) + '</span></label>').join('') + '</details>'
+      const n = p.g.classes.reduce((a, c) => a + studentsOf(c.id).length, 0);
+      return '<div class="card" style="padding:10px"><label class="row"><input type="checkbox" data-carry="' + i + '" ' + (p.carry ? 'checked' : '') + '><b class="grow">' + esc(p.g.name) + ' · ' + esc(p.g.classes.map(c => c.section).join(', ')) + ' (' + n + ')</b></label>' +
+        (p.carry ? '<div class="grid2" style="margin-top:6px"><div><label class="l">New class</label><input class="f" data-to="' + i + '" value="' + esc(p.to) + '"></div><div><label class="l">Subject</label><input class="f" data-sub="' + i + '" value="' + esc(p.subject || '') + '"></div></div>' +
+          '<label class="l" style="margin-top:6px">Sections YOU teach in ' + esc(p.to) + ' (comma between)</label><input class="f" data-sec="' + i + '" value="' + esc(p.sections) + '" placeholder="' + (gradeOf(p.to) === 10 ? 'Electron, Proton' : 'e.g. Alpha, Beta') + '">'
           : '<div class="muted small">Not carried (e.g. Class 10 finished). Its data stays in ' + from + '.</div>') + '</div>';
     }).join('');
     $$('[data-carry]', el).forEach(b => b.onchange = () => { plan[+b.dataset.carry].carry = b.checked; draw(el); });
     $$('[data-to]', el).forEach(b => b.oninput = () => { plan[+b.dataset.to].to = b.value.trim(); });
-    $$('[data-sec]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sec].section = b.value.trim(); });
-    $$('[data-k]', el).forEach(b => b.onchange = () => { const k = plan[+b.dataset.k].keep; b.checked ? k.add(b.value) : k.delete(b.value); const sm = b.closest('details').querySelector('summary b'); sm.textContent = k.size; });
+    $$('[data-sub]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sub].subject = b.value.trim(); });
+    $$('[data-sec]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sec].sections = b.value; });
   };
-  sheet('Start session ' + to, '<p class="muted small">Students move up with their names, phones and family info. Only class and section change. ' + from + ' data stays safe and viewable. After this, import the new official list to update rolls and add newcomers.</p>' +
-    '<label class="row small"><input type="checkbox" id="kr" checked> Keep old roll numbers for now</label><div id="pp" style="margin-top:10px"></div>',
+  sheet('Start session ' + to, '<p class="muted small">Every class is re-ranked and mixed across sections each year, so section and roll both change. ' +
+    'This creates the empty new sections. Then open each one and <b>import its new official list</b> (with Student Code): the app finds each student in last year\'s class (any section), keeps their name, phones, family info and earlier marks/notes, and sets the new roll. ' + from + ' data stays safe and viewable.</p><div id="pp" style="margin-top:10px"></div>',
     [{label: 'Cancel', cls: 'sec'}, {label: '🎓 Start ' + to, fn: el => {
-      const keepRoll = $('#kr', el).checked;
       const snap = JSON.stringify(S);
-      let moved = 0;
+      let made = 0;
       plan.filter(p => p.carry).forEach(p => {
-        const nc = {id: uid(), year: to, name: p.to || p.c.name, section: p.section, subject: p.c.subject, ct: false, ctName: '', created: Date.now(), prevClassId: p.c.id};
-        S.classes.push(nc);
-        studentsOf(p.c.id).filter(s => p.keep.has(s.id)).forEach(s => {
-          const n = JSON.parse(JSON.stringify(s));
-          Object.assign(n, {id: uid(), classId: nc.id, prevId: s.id, created: Date.now(), archived: false});
-          if (!keepRoll) n.roll = '';
-          S.students.push(n); moved++;
+        const name = p.to || p.g.name;
+        const secs = [...new Set(String(p.sections).split(/[,;/]+/).map(x => x.trim()).filter(Boolean))];
+        (secs.length ? secs : ['']).forEach(sec => {
+          if (S.classes.some(c => String(c.year) === to && c.name === name && (c.section || '') === sec)) return;
+          S.classes.push({id: uid(), year: to, name, section: sec, subject: p.subject || p.g.classes[0].subject, ct: false, ctName: '', created: Date.now(), prevClassIds: p.g.classes.map(c => c.id)});
+          made++;
         });
       });
       S.settings.year = to; viewYear = null;
       save(); go('#/'); render();
-      toast(moved + ' students moved to ' + to, () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
+      toast(made + ' sections ready for ' + to + ' — now import each official list', () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
     }}], el => draw(el));
 }
 
@@ -818,11 +837,23 @@ function reviewImport(c, rows, extraNote = '') {
   if (!rows.length) { toast('No names found. Try a clearer photo or paste text.'); return; }
   const existing = studentsOf(c.id, true);
   const findEx = r => (r.sid && existing.find(s => s.sid && String(s.sid) === String(r.sid))) || (r.roll && !r.sid && existing.find(s => String(s.roll) === String(r.roll))) || (r.roll && r.sid && existing.find(s => !s.sid && String(s.roll) === String(r.roll)));
+  // Last year's students of this class (ALL sections): sections and rolls are reshuffled every year,
+  // so a student of 2026 Class 9 Beta may be 2027 Class 10 Electron with a new roll.
+  const pool = prevPool(c), yr = String(c.year);
+  const norm = x => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const findPrev = r => {
+    if (r.sid) { const m = pool.find(s => s.sid && String(s.sid) === String(r.sid)); if (m) return m; }
+    const nm = norm(r.name); if (!nm) return null;
+    const ms = pool.filter(s => norm(s.name) === nm && !(r.sid && s.sid));
+    return ms.length === 1 ? ms[0] : null;
+  };
+  const linkedElsewhere = p => S.students.find(s => s.prevId === p.id && s.classId !== c.id && String((cls(s.classId) || {}).year) === yr);
   const draw = el => {
     $('#rv', el).innerHTML = rows.map((r, i) => {
-      const ex = findEx(r);
+      const ex = findEx(r), pv = !ex && findPrev(r), le = pv && linkedElsewhere(pv);
       return '<div class="ocrrow" data-i="' + i + '"><input type="checkbox" ' + (r.ok ? 'checked' : '') + ' data-f="ok"><input class="f" data-f="roll" value="' + esc(r.roll) + '" placeholder="Roll" inputmode="numeric"><input class="f" data-f="name" value="' + esc(r.name) + '" placeholder="Name"><input class="f" data-f="phone" value="' + esc(r.phone) + '" placeholder="Mobile" inputmode="tel"><button class="ib" style="color:var(--bad);width:30px" data-del title="Remove row">✕</button>' +
-        (ex ? '<div class="small" style="grid-column:2/6;color:var(--warn);margin-top:-4px">Already in class (' + esc(ex.name) + (String(ex.roll) !== String(r.roll) ? ', roll ' + esc(ex.roll) + ' → ' + esc(r.roll) : '') + ') → will be updated</div>' : '') + '</div>';
+        (ex ? '<div class="small" style="grid-column:2/6;color:var(--warn);margin-top:-4px">Already in class (' + esc(ex.name) + (String(ex.roll) !== String(r.roll) ? ', roll ' + esc(ex.roll) + ' → ' + esc(r.roll) : '') + ') → will be updated</div>' : '') +
+        (pv ? '<div class="small" style="grid-column:2/6;color:var(--ok,#2e7d32);margin-top:-4px">🔗 ' + esc((cls(pv.classId) || {}).year || '') + ' ' + esc(classLabel(cls(pv.classId))) + ', roll ' + esc(pv.roll || '–') + ' → new roll ' + esc(r.roll || '–') + '. Earlier marks & notes linked.' + (le ? ' Now in ' + esc(classLabel(cls(le.classId))) + ' → will move here.' : '') + '</div>' : '') + '</div>';
     }).join('') + '<button class="btn sec sm" id="addRow">＋ Add row</button>';
     $$('.ocrrow', el).forEach(row => {
       const r = rows[+row.dataset.i];
@@ -834,15 +865,24 @@ function reviewImport(c, rows, extraNote = '') {
   sheet('Check the list (' + rows.length + ')', '<p class="muted small">Read carefully and correct any mistakes. Unticked rows are skipped. Same Student ID (or same roll) = update.' + extraNote + '</p>' +
     (existing.filter(s => !s.archived).length ? '<label class="row small" style="margin-bottom:10px"><input type="checkbox" id="mm"> Students already in this class but <b>not</b> in this list have left → mark them removed</label>' : '') + '<div id="rv"></div>',
     [{label: 'Cancel', cls: 'sec'}, {label: 'Save to ' + esc(classLabel(c)), fn: el => {
-      let add = 0, upd = 0, gone = 0;
+      let add = 0, upd = 0, gone = 0, linked = 0;
       const snap = JSON.stringify(S), seen = new Set();
+      const FIELDS = ['sid', 'roll', 'name', 'phone', 'phone2', 'father', 'fOcc', 'mother', 'mOcc', 'address', 'weakness'];
       rows.filter(r => r.ok && r.name).forEach(r => {
-        const ex = findEx(r);
-        if (ex) { ['sid', 'roll', 'name', 'phone', 'phone2', 'father', 'fOcc', 'mother', 'mOcc', 'address', 'weakness'].forEach(k => { if (r[k]) ex[k] = r[k]; }); if (r.custom) ex.custom = Object.assign(ex.custom || {}, r.custom); ex.archived = false; seen.add(ex.id); upd++; }
+        const ex = findEx(r), pv = !ex && findPrev(r);
+        if (pv) {
+          const le = linkedElsewhere(pv);
+          const n = le || Object.assign(JSON.parse(JSON.stringify(pv)), {id: uid(), prevId: pv.id, created: Date.now()});
+          Object.assign(n, {classId: c.id, archived: false, roll: r.roll || ''});
+          FIELDS.forEach(k => { if (r[k]) n[k] = r[k]; });
+          if (r.custom) n.custom = Object.assign(n.custom || {}, r.custom);
+          if (!le) S.students.push(n);
+          seen.add(n.id); linked++;
+        } else if (ex) { ['sid', 'roll', 'name', 'phone', 'phone2', 'father', 'fOcc', 'mother', 'mOcc', 'address', 'weakness'].forEach(k => { if (r[k]) ex[k] = r[k]; }); if (r.custom) ex.custom = Object.assign(ex.custom || {}, r.custom); ex.archived = false; seen.add(ex.id); upd++; }
         else { const n = Object.assign({id: uid(), classId: c.id, created: Date.now(), custom: {}}, {sid: r.sid || '', roll: r.roll, name: r.name, phone: r.phone || '', phone2: r.phone2 || '', father: r.father || '', fOcc: r.fOcc || '', mother: r.mother || '', mOcc: r.mOcc || '', address: r.address || '', weakness: r.weakness || '', custom: r.custom || {}}); S.students.push(n); seen.add(n.id); add++; }
       });
       if ($('#mm', el) && $('#mm', el).checked) existing.forEach(s => { if (!s.archived && !seen.has(s.id)) { s.archived = true; gone++; } });
-      save(); render(); toast(add + ' added, ' + upd + ' updated' + (gone ? ', ' + gone + ' marked left' : ''), () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
+      save(); render(); toast((linked ? linked + ' from last year, ' : '') + add + ' new, ' + upd + ' updated' + (gone ? ', ' + gone + ' marked left' : ''), () => { S = JSON.parse(snap); save(); render(); toast('Undone'); });
     }}], el => draw(el));
 }
 function pickFile(accept, capture) {
