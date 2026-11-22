@@ -115,7 +115,7 @@ table.mk td.tot{font-weight:700;color:var(--brand);min-width:38px}
    Data lives only on this phone (IndexedDB). Optional backup to the teacher's own
    Google Drive + Google Sheet and Calendar sync through an Apps Script link.
    ========================================================= */
-const APP_VER = '1.3.0';
+const APP_VER = '1.4.0';
 const NATIVE = (() => { try { return !!(window.AndroidApp && AndroidApp.isApp()); } catch (e) { return false; } })();
 const SCHOOL = 'Bangladesh Air Force Shaheen College Bogura';
 /* author credit (encoded) */
@@ -175,6 +175,7 @@ async function load() {
   if (!S.marks) S.marks = {};
   S.classes.forEach(c => { if (!c.year) c.year = S.settings.year; });
   if (!S.settings.teacher) S.settings.teacher = AUTHOR.name;
+  seedSchool();
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
 }
 let saveT = null;
@@ -268,11 +269,13 @@ function setHeader(title, sub, back, right = '') {
 function render() {
   const h = location.hash.replace(/^#\/?/, '').split('/');
   const fab = $('.fab'); if (fab) fab.remove();
+  seedSchool(); // also after restoring an older backup
   window.scrollTo(0, 0);
   if (h[0] === 'class' && cls(h[1])) { if (h[2] === 'marks' && EX[h[3]]) return viewMarks(cls(h[1]), EX[h[3]]); return viewClass(cls(h[1]), h[2] || 'students'); }
   if (h[0] === 'student' && stu(h[1])) return viewStudent(stu(h[1]));
   if (h[0] === 'events') return viewEvents();
   if (h[0] === 'settings') return viewSettings();
+  if (h[0] === 'school') return viewSchool();
   viewHome();
 }
 
@@ -302,7 +305,7 @@ function viewHome() {
         '<div class="name">' + esc(classLabel(c)) + ' ' + (c.ct ? '<span class="badge ct">⭐ Class Teacher</span>' : '') + '</div>' +
         '<div class="muted">' + esc(c.subject || '') + ' · ' + n + ' students' + (weak ? ' · <span style="color:var(--bad)">' + weak + ' need care</span>' : '') + '</div></div><span class="muted">›</span></div>';
     });
-    html += '<button class="btn sec full" id="addC">＋ Add class / section</button>';
+    html += '<div class="grid2"><button class="btn sec full" id="addC">＋ Add class / section</button><a class="btn sec full" href="#/school" style="text-align:center;text-decoration:none">🏫 Classes & sections</a></div>';
     if (yr === String(S.settings.year)) html += '<div style="height:8px"></div><button class="btn sec full" id="promo">🎓 Start new session ' + (Number(S.settings.year) + 1) + ' (move students up)</button>';
   }
   const up = S.events.filter(e => e.type !== 'routine' && e.date >= today()).sort((a, b) => a.date < b.date ? -1 : 1).slice(0, 4);
@@ -328,16 +331,19 @@ function quickSetup() {
     defs.map((d, i) => '<div class="row" style="margin:8px 0"><b style="width:74px">' + d[0] + '</b><span class="muted" style="width:62px">' + d[1] + '</span><input class="f grow" data-i="' + i + '" placeholder="Section"><label class="row small" style="gap:4px"><input type="radio" name="ct" value="' + i + '">CT</label></div>').join(''),
     [{label: 'Cancel', cls: 'sec'}, {label: 'Create', fn: el => {
       const ct = ($('input[name=ct]:checked', el) || {}).value;
-      defs.forEach((d, i) => S.classes.push({id: uid(), year: S.settings.year, name: d[0], subject: d[1], section: $('input[data-i="' + i + '"]', el).value.trim(), ct: String(i) === ct, ctName: '', created: Date.now()}));
+      defs.forEach((d, i) => { const sec = $('input[data-i="' + i + '"]', el).value.trim(); S.classes.push({id: uid(), year: S.settings.year, name: d[0], subject: d[1], section: sec, ct: String(i) === ct, ctName: '', created: Date.now()}); rememberSection(d[0], sec); });
       save(); render(); toast('Classes created');
     }}]);
 }
 function editClass(c) {
   const isNew = !c; c = c || {name: '', subject: '', section: '', ct: false, ctName: ''};
+  const names = S.settings.school.map(g => g.name);
+  if (c.name && !names.includes(c.name)) names.push(c.name);
+  const secOpts = n => ((schoolOf(n) || {}).sections || []).map(s => '<option value="' + esc(s) + '">').join('');
   sheet(isNew ? 'Add class' : 'Edit class',
-    '<label class="l">Class</label><select class="f" id="cn">' + ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'Other'].map(x => '<option' + (x === c.name ? ' selected' : '') + '>' + x + '</option>').join('') + '</select>' +
-    '<input class="f" id="cnx" placeholder="Class name" style="margin-top:6px;' + (['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].includes(c.name) || isNew ? 'display:none' : '') + '" value="' + esc(c.name) + '">' +
-    '<div class="grid2"><div><label class="l">Section</label><input class="f" id="cs" value="' + esc(c.section) + '" placeholder="e.g. A"></div>' +
+    '<label class="l">Class</label><select class="f" id="cn">' + names.concat('Other').map(x => '<option' + (x === c.name ? ' selected' : '') + '>' + esc(x) + '</option>').join('') + '</select>' +
+    '<input class="f" id="cnx" placeholder="New class name" style="margin-top:6px;display:none" value="">' +
+    '<div class="grid2"><div><label class="l">Section</label><input class="f" id="cs" list="secs" value="' + esc(c.section) + '" placeholder="Pick or type"><datalist id="secs">' + secOpts(c.name || names[0]) + '</datalist></div>' +
     '<div><label class="l">Subject</label><input class="f" id="csub" list="subs" value="' + esc(c.subject) + '" placeholder="e.g. Biology"><datalist id="subs"><option>Science</option><option>Biology</option></datalist></div></div>' +
     '<label class="l">Class Teacher of this section (name, for the marksheet)</label><input class="f" id="ctn" value="' + esc(c.ctName) + '">' +
     '<label class="row" style="margin-top:12px"><input type="checkbox" id="ct" ' + (c.ct ? 'checked' : '') + '> <span>⭐ I am the Class Teacher of this section<br><span class="muted">Shows family info and weakness fields for its students</span></span></label>',
@@ -345,8 +351,70 @@ function editClass(c) {
       let name = val(el, '#cn'); if (name === 'Other') name = val(el, '#cnx') || 'Class';
       Object.assign(c, {name, section: val(el, '#cs'), subject: val(el, '#csub'), ctName: val(el, '#ctn'), ct: $('#ct', el).checked});
       if (isNew) { c.id = uid(); c.created = Date.now(); c.year = viewYear || S.settings.year; S.classes.push(c); }
+      rememberSection(c.name, c.section);
       save(); render(); toast(isNew ? 'Class added' : 'Saved');
-    }}], el => { $('#cn', el).onchange = e => { $('#cnx', el).style.display = e.target.value === 'Other' ? '' : 'none'; }; });
+    }}], el => { $('#cn', el).onchange = e => { $('#cnx', el).style.display = e.target.value === 'Other' ? '' : 'none'; $('#secs', el).innerHTML = secOpts(e.target.value); }; });
+}
+
+/* ---------- SCHOOL: every class of the school and its sections (editable list) ----------
+   S.settings.school = [{name: 'Class 9', sections: ['Alpha', 'Beta', …]}, …]
+   It is only a list of names: "my classes" (S.classes) are the sections you teach in a year.
+   Renaming here also renames your current-year class with that name; removing never deletes data. */
+const SUBJ_GUESS = n => (gradeOf(n) || 0) >= 9 ? 'Biology' : 'Science';
+function seedSchool() {
+  if (Array.isArray(S.settings.school)) return;
+  const L = [];
+  const get = n => L.find(x => x.name === n) || (L.push({name: n, sections: []}), L[L.length - 1]);
+  ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'].forEach(get);
+  S.classes.forEach(c => { const g = get(c.name); if (c.section && !g.sections.includes(c.section)) g.sections.push(c.section); });
+  const ten = get('Class 10'); if (!ten.sections.length) ten.sections.push('Electron', 'Proton');
+  L.sort((a, b) => (gradeOf(a.name) || 99) - (gradeOf(b.name) || 99));
+  S.settings.school = L;
+}
+const schoolOf = name => (S.settings.school || []).find(x => x.name === name);
+function rememberSection(name, sec) {
+  if (!name) return;
+  let g = schoolOf(name);
+  if (!g) { g = {name, sections: []}; S.settings.school.push(g); S.settings.school.sort((a, b) => (gradeOf(a.name) || 99) - (gradeOf(b.name) || 99)); }
+  if (sec && !g.sections.includes(sec)) g.sections.push(sec);
+}
+function viewSchool() {
+  setHeader('Classes & sections', 'All classes of the school', '#/');
+  const yr = String(S.settings.year), L = S.settings.school, app = $('#app');
+  const mine = (n, s) => S.classes.find(c => String(c.year) === yr && c.name === n && (c.section || '') === (s || ''));
+  app.innerHTML = '<p class="muted small" style="margin:0 2px 10px">Write the section names of every class here. Tap <b>＋ Mine</b> on a section you teach in ' + yr + ' to add it to your classes. Renaming also renames your ' + yr + ' class; removing a name never deletes students or marks.</p>' +
+    L.map((g, i) => '<div class="card" style="padding:10px"><div class="row"><input class="f grow" data-cn="' + i + '" value="' + esc(g.name) + '" style="font-weight:700"><button class="btn sm red" data-cx="' + i + '" title="Remove class">✕</button></div>' +
+      g.sections.map((s, j) => { const m = mine(g.name, s);
+        return '<div class="row" style="margin:6px 0 0 12px;gap:6px"><input class="f grow" data-sn="' + i + '.' + j + '" value="' + esc(s) + '">' +
+          (m ? '<a class="badge ct" href="#/class/' + m.id + '" style="white-space:nowrap">✓ Mine ›</a>' : '<button class="btn sm sec" data-sm="' + i + '.' + j + '" style="white-space:nowrap">＋ Mine</button>') +
+          '<button class="btn sm red" data-sx="' + i + '.' + j + '">✕</button></div>'; }).join('') +
+      '<div class="row" style="margin:6px 0 0 12px;gap:6px"><input class="f grow" data-sa="' + i + '" placeholder="New section name"><button class="btn sm" data-sb="' + i + '">＋ Section</button></div></div>').join('') +
+    '<div class="card" style="padding:10px"><div class="row" style="gap:6px"><input class="f grow" id="ncn" placeholder="New class, e.g. Class 11"><button class="btn sm" id="ncA">＋ Class</button></div></div>';
+  const redo = (msg, fn) => withUndo(msg, () => { fn(); });
+  const curOf = (n, s) => S.classes.filter(c => String(c.year) === yr && c.name === n && (s === undefined || (c.section || '') === s));
+  $$('[data-cn]', app).forEach(inp => inp.onchange = () => {
+    const g = L[+inp.dataset.cn], nv = inp.value.trim(); if (!nv || nv === g.name) return;
+    if (schoolOf(nv)) { toast(nv + ' already exists'); inp.value = g.name; return; }
+    redo('Renamed', () => { curOf(g.name).forEach(c => c.name = nv); g.name = nv; });
+  });
+  $$('[data-cx]', app).forEach(b => b.onclick = () => { const i = +b.dataset.cx; redo(L[i].name + ' removed from list', () => L.splice(i, 1)); });
+  const ij = v => v.split('.').map(Number);
+  $$('[data-sn]', app).forEach(inp => inp.onchange = () => {
+    const [i, j] = ij(inp.dataset.sn), g = L[i], old = g.sections[j], nv = inp.value.trim(); if (!nv || nv === old) return;
+    if (g.sections.includes(nv)) { toast(nv + ' already exists'); inp.value = old; return; }
+    redo('Renamed', () => { curOf(g.name, old).forEach(c => c.section = nv); g.sections[j] = nv; });
+  });
+  $$('[data-sx]', app).forEach(b => b.onclick = () => { const [i, j] = ij(b.dataset.sx); redo(L[i].sections[j] + ' removed from list', () => L[i].sections.splice(j, 1)); });
+  $$('[data-sm]', app).forEach(b => b.onclick = () => {
+    const [i, j] = ij(b.dataset.sm), g = L[i], same = S.classes.find(c => c.name === g.name);
+    redo(g.name + ' · ' + g.sections[j] + ' added to your classes', () => S.classes.push({id: uid(), year: yr, name: g.name, section: g.sections[j], subject: same ? same.subject : SUBJ_GUESS(g.name), ct: false, ctName: '', created: Date.now()}));
+  });
+  $$('[data-sb]', app).forEach(b => b.onclick = () => {
+    const i = +b.dataset.sb, inp = $('[data-sa="' + i + '"]', app), nv = inp.value.trim(); if (!nv) return;
+    if (L[i].sections.includes(nv)) { toast(nv + ' already exists'); return; }
+    redo('Section added', () => L[i].sections.push(nv));
+  });
+  $('#ncA').onclick = () => { const nv = val(app, '#ncn'); if (!nv) return; if (schoolOf(nv)) { toast(nv + ' already exists'); return; } redo('Class added', () => rememberSection(nv)); };
 }
 
 /* ---------- NEW SESSION: promote classes to the next year ----------
@@ -376,22 +444,26 @@ function promoteSession() {
   const groups = [];
   src.forEach(c => { let g = groups.find(x => x.name === c.name); if (!g) groups.push(g = {name: c.name, classes: []}); g.classes.push(c); });
   const plan = groups.map(g => {
-    const nx = nextClassName(g.name);
+    const nx = nextClassName(g.name), list = (schoolOf(nx) || {}).sections || [];
+    const old = g.classes.map(c => c.section).filter(s => list.includes(s));
     return {g, to: nx, carry: !/Class\s*10$/i.test(g.name), subject: g.classes[0].subject,
-      sections: DEFAULT_SECTIONS[gradeOf(nx)] || g.classes.map(c => c.section).filter(Boolean).join(', ')};
+      pick: new Set(old.length ? old : list), sections: list.length ? '' : (DEFAULT_SECTIONS[gradeOf(nx)] || '')};
   });
   const draw = el => {
     $('#pp', el).innerHTML = plan.map((p, i) => {
-      const n = p.g.classes.reduce((a, c) => a + studentsOf(c.id).length, 0);
+      const n = p.g.classes.reduce((a, c) => a + studentsOf(c.id).length, 0), list = (schoolOf(p.to) || {}).sections || [];
       return '<div class="card" style="padding:10px"><label class="row"><input type="checkbox" data-carry="' + i + '" ' + (p.carry ? 'checked' : '') + '><b class="grow">' + esc(p.g.name) + ' · ' + esc(p.g.classes.map(c => c.section).join(', ')) + ' (' + n + ')</b></label>' +
         (p.carry ? '<div class="grid2" style="margin-top:6px"><div><label class="l">New class</label><input class="f" data-to="' + i + '" value="' + esc(p.to) + '"></div><div><label class="l">Subject</label><input class="f" data-sub="' + i + '" value="' + esc(p.subject || '') + '"></div></div>' +
-          '<label class="l" style="margin-top:6px">Sections YOU teach in ' + esc(p.to) + ' (comma between)</label><input class="f" data-sec="' + i + '" value="' + esc(p.sections) + '" placeholder="' + (gradeOf(p.to) === 10 ? 'Electron, Proton' : 'e.g. Alpha, Beta') + '">'
+          '<label class="l" style="margin-top:6px">Sections YOU teach in ' + esc(p.to) + '</label>' +
+          (list.length ? '<div class="chips">' + list.map(s => '<span class="chip ' + (p.pick.has(s) ? 'on' : '') + '" data-pk="' + i + '" data-s="' + esc(s) + '">' + (p.pick.has(s) ? '✓ ' : '') + esc(s) + '</span>').join('') + '</div>' : '') +
+          '<input class="f" data-sec="' + i + '" value="' + esc(p.sections) + '" placeholder="' + (list.length ? 'Other section (optional)' : 'Section names, comma between') + '">'
           : '<div class="muted small">Not carried (e.g. Class 10 finished). Its data stays in ' + from + '.</div>') + '</div>';
-    }).join('');
+    }).join('') + '<p class="muted small">Section names come from <b>🏫 Classes & sections</b> on the home page.</p>';
     $$('[data-carry]', el).forEach(b => b.onchange = () => { plan[+b.dataset.carry].carry = b.checked; draw(el); });
-    $$('[data-to]', el).forEach(b => b.oninput = () => { plan[+b.dataset.to].to = b.value.trim(); });
+    $$('[data-to]', el).forEach(b => b.onchange = () => { plan[+b.dataset.to].to = b.value.trim(); draw(el); });
     $$('[data-sub]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sub].subject = b.value.trim(); });
     $$('[data-sec]', el).forEach(b => b.oninput = () => { plan[+b.dataset.sec].sections = b.value; });
+    $$('[data-pk]', el).forEach(b => b.onclick = () => { const k = plan[+b.dataset.pk].pick, s = b.dataset.s; k.has(s) ? k.delete(s) : k.add(s); draw(el); });
   };
   sheet('Start session ' + to, '<p class="muted small">Every class is re-ranked and mixed across sections each year, so section and roll both change. ' +
     'This creates the empty new sections. Then open each one and <b>import its new official list</b> (with Student Code): the app finds each student in last year\'s class (any section), keeps their name, phones, family info and earlier marks/notes, and sets the new roll. ' + from + ' data stays safe and viewable.</p><div id="pp" style="margin-top:10px"></div>',
@@ -400,8 +472,11 @@ function promoteSession() {
       let made = 0;
       plan.filter(p => p.carry).forEach(p => {
         const name = p.to || p.g.name;
-        const secs = [...new Set(String(p.sections).split(/[,;/]+/).map(x => x.trim()).filter(Boolean))];
-        (secs.length ? secs : ['']).forEach(sec => {
+        const list = (schoolOf(name) || {}).sections || [];
+        const secs = [...new Set([...p.pick].filter(s => list.includes(s)).concat(String(p.sections).split(/[,;/]+/).map(x => x.trim()).filter(Boolean)))];
+        if (!secs.length) return;
+        secs.forEach(sec => {
+          rememberSection(name, sec);
           if (S.classes.some(c => String(c.year) === to && c.name === name && (c.section || '') === sec)) return;
           S.classes.push({id: uid(), year: to, name, section: sec, subject: p.subject || p.g.classes[0].subject, ct: false, ctName: '', created: Date.now(), prevClassIds: p.g.classes.map(c => c.id)});
           made++;
